@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="py-5" style="background: var(--navy); color: white;">
-    <div class="container text-center pt-5">
-        <h1 class="fw-bold">Arsip Artikel & Berita</h1>
-        <p class="lead opacity-75">Kumpulan informasi, kegiatan, dan kabar terbaru dari Desa Tajungan</p>
+<section class="py-3" style="background: white; border-bottom: 3px solid var(--color-5);">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">Arsip Artikel & Berita</h2>
+        <p class="mb-0" style="color: var(--color-6); font-size: 1rem;">Kumpulan informasi, kegiatan, dan kabar terbaru dari Desa Tajungan</p>
     </div>
 </section>
 
@@ -33,62 +33,31 @@
 
         {{-- Container Artikel --}}
         <div class="row g-4" id="article-container">
-            <div class="col-md-4 article-item" data-category="Ekonomi">
+            @forelse($items as $item)
+            <div class="col-md-4 article-item" data-category="{{ $item->category ?? 'Umum' }}">
                 <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden news-card-archive">
                     <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Berita" style="height: 220px; object-fit: cover;">
-                        <span class="position-absolute top-0 end-0 m-3 badge bg-primary px-3 py-2 rounded-pill category-label">Ekonomi</span>
+                        <img src="{{ $item->image ?: 'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=600&q=80' }}" class="card-img-top" alt="{{ $item->title }}" style="height: 220px; object-fit: cover;">
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-primary px-3 py-2 rounded-pill category-label">{{ $item->category ?? 'Umum' }}</span>
                     </div>
                     <div class="card-body p-4 text-start">
                         <div class="d-flex align-items-center mb-2 text-muted small">
-                            <i class="far fa-calendar-alt me-2"></i> 10 Maret 2026
+                            <i class="far fa-calendar-alt me-2"></i> {{ $item->year ?? '-' }}
                         </div>
                         <h5 class="fw-bold mb-3 lh-base article-title">
-                            <a href="#" class="text-decoration-none text-dark hover-gold">Pesta Rakyat & Bazaar UMKM Tajungan 2026</a>
+                            <a href="{{ $item->link ?: '#' }}" class="text-decoration-none text-dark hover-gold" target="_blank">{{ $item->title }}</a>
                         </h5>
-                        <p class="text-muted small mb-4">Meningkatkan ekonomi lokal melalui kolaborasi warga dalam acara tahunan desa...</p>
-                        <a href="#" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
+                        <p class="text-muted small mb-4">{{ $item->excerpt ?: 'Tidak ada ringkasan tersedia.' }}</p>
+                        <a href="{{ $item->link ?: '#' }}" class="btn btn-link text-primary fw-bold p-0 text-decoration-none" target="_blank">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-4 article-item" data-category="Kesehatan">
-                <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden news-card-archive">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Berita" style="height: 220px; object-fit: cover;">
-                        <span class="position-absolute top-0 end-0 m-3 badge bg-success px-3 py-2 rounded-pill category-label">Kesehatan</span>
-                    </div>
-                    <div class="card-body p-4 text-start">
-                        <div class="d-flex align-items-center mb-2 text-muted small">
-                            <i class="far fa-calendar-alt me-2"></i> 08 Maret 2026
-                        </div>
-                        <h5 class="fw-bold mb-3 lh-base article-title">
-                            <a href="#" class="text-decoration-none text-dark hover-gold">Jadwal Posyandu & Cek Kesehatan Gratis</a>
-                        </h5>
-                        <p class="text-muted small mb-4">Kegiatan rutin bulanan untuk menjaga kesehatan balita dan lansia di lingkungan...</p>
-                        <a href="#" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
-                    </div>
-                </div>
+            @empty
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Belum ada arsip artikel yang tersedia.</p>
             </div>
-
-            <div class="col-md-4 article-item" data-category="Pembangunan">
-                <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden news-card-archive">
-                    <div class="position-relative">
-                        <img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Berita" style="height: 220px; object-fit: cover;">
-                        <span class="position-absolute top-0 end-0 m-3 badge bg-info px-3 py-2 rounded-pill category-label">Pembangunan</span>
-                    </div>
-                    <div class="card-body p-4 text-start">
-                        <div class="d-flex align-items-center mb-2 text-muted small">
-                            <i class="far fa-calendar-alt me-2"></i> 05 Maret 2026
-                        </div>
-                        <h5 class="fw-bold mb-3 lh-base article-title">
-                            <a href="#" class="text-decoration-none text-dark hover-gold">Perbaikan Drainase Dusun Pesisir</a>
-                        </h5>
-                        <p class="text-muted small mb-4">Upaya antisipasi banjir di musim hujan bagi warga pesisir Desa Tajungan...</p>
-                        <a href="#" class="btn btn-link text-primary fw-bold p-0 text-decoration-none">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
-                    </div>
-                </div>
-            </div>
+            @endforelse
         </div>
 
         {{-- Pesan Jika Data Tidak Ditemukan --}}

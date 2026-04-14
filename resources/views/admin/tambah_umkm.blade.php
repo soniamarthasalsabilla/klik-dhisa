@@ -1,105 +1,137 @@
-@extends('layouts.app')
+@extends('layouts.admin')
+@section('title', 'Tambah UMKM')
+@section('page-title', 'Tambah UMKM')
 
 @section('content')
-<div class="container my-5">
-    <div class="card shadow border-0 rounded-4 p-4 mb-5">
-        <h2 class="mb-4 fw-bold text-center" style="color: #002b5b;">Input Data UMKM Desa Tajungan</h2>
-        
-        <form action="{{ route('admin.store') }}" method="POST">
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-4">
+
+        @if($errors->any())
+            <div class="alert alert-danger rounded-3">
+                <ul class="mb-0 small">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="row">
-                <div class="col-md-6 text-start">
+            <div class="row g-4">
+
+                {{-- Kolom Kiri: Data UMKM --}}
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-navy mb-3 border-bottom pb-2">Data Usaha</h6>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Nama Usaha</label>
-                        <input type="text" name="nama_usaha" class="form-control" value="{{ old('nama_usaha') }}" required>
+                        <label class="form-label fw-semibold">Nama Usaha <span class="text-danger">*</span></label>
+                        <input type="text" name="nama_usaha" class="form-control @error('nama_usaha') is-invalid @enderror"
+                               value="{{ old('nama_usaha') }}" placeholder="contoh: Batik Tajungan" required>
+                        @error('nama_usaha')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Pemilik</label>
-                        <input type="text" name="pemilik" class="form-control" value="{{ old('pemilik') }}" required>
+                        <label class="form-label fw-semibold">Pemilik <span class="text-danger">*</span></label>
+                        <input type="text" name="pemilik" class="form-control @error('pemilik') is-invalid @enderror"
+                               value="{{ old('pemilik') }}" required>
+                        @error('pemilik')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Kategori UMKM</label>
-                        <select name="kategori" class="form-select" required>
-                            <option value="" selected disabled>-- Pilih Kategori --</option>
-                            <option value="Makanan">Makanan</option>
-                            <option value="Kerajinan">Kerajinan</option>
-                            <option value="Jasa">Jasa</option>
-                            <option value="Pertanian">Pertanian</option>
+                        <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                        <select name="kategori" class="form-select @error('kategori') is-invalid @enderror" required>
+                            <option value="" disabled selected>-- Pilih Kategori --</option>
+                            @foreach(['Makanan','Kerajinan','Jasa','Pertanian'] as $kat)
+                                <option value="{{ $kat }}" {{ old('kategori') === $kat ? 'selected' : '' }}>{{ $kat }}</option>
+                            @endforeach
                         </select>
+                        @error('kategori')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">No. WhatsApp</label>
-                        <input type="text" name="no_hp" class="form-control" placeholder="628123456789">
+                        <label class="form-label fw-semibold">No. WhatsApp</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fab fa-whatsapp text-success"></i></span>
+                            <input type="text" name="no_hp" class="form-control"
+                                   value="{{ old('no_hp') }}" placeholder="628123456789">
+                        </div>
+                        <small class="text-muted">Format internasional tanpa +, contoh: 628123456789</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Foto Usaha</label>
+                        <input type="file" name="foto" class="form-control" accept="image/*" id="fotoInput">
+                        <small class="text-muted">JPG, PNG (Maks. 2MB)</small>
+                    </div>
+                    <div id="fotoPreview" class="d-none mt-2">
+                        <img id="previewImg" src="" alt="Preview" class="img-fluid rounded-3" style="max-height:180px;object-fit:cover;">
                     </div>
                 </div>
-                <div class="col-md-6 text-start">
-                    <label class="form-label fw-bold">Lokasi UMKM (Klik pada Peta)</label>
-                    <div id="map-input" class="mb-3 shadow-sm border rounded-3" style="height: 300px;"></div>
+
+                {{-- Kolom Kanan: Peta --}}
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-navy mb-3 border-bottom pb-2">Lokasi di Peta <span class="text-danger">*</span></h6>
+                    <p class="small text-muted mb-2">Klik pada peta untuk menentukan lokasi UMKM.</p>
+                    <div id="map-input" class="border rounded-3 mb-3" style="height:320px;"></div>
                     <div class="row g-2">
                         <div class="col">
-                            <input type="text" name="latitude" id="lat" class="form-control" placeholder="Lat" readonly required>
+                            <label class="form-label small fw-semibold">Latitude</label>
+                            <input type="text" name="latitude" id="lat" class="form-control form-control-sm"
+                                   placeholder="Klik peta" readonly required>
                         </div>
                         <div class="col">
-                            <input type="text" name="longitude" id="lng" class="form-control" placeholder="Lng" readonly required>
+                            <label class="form-label small fw-semibold">Longitude</label>
+                            <input type="text" name="longitude" id="lng" class="form-control form-control-sm"
+                                   placeholder="Klik peta" readonly required>
                         </div>
                     </div>
+                    <p class="small text-muted mt-2 mb-0"><i class="fas fa-info-circle me-1"></i>Koordinat diisi otomatis setelah klik peta.</p>
                 </div>
+
             </div>
-            <button type="submit" class="btn btn-primary w-100 py-3 mt-4 fw-bold" style="background: #002b5b; border: none;">
-                <i class="fas fa-save me-2"></i> SIMPAN DATA UMKM
-            </button>
+
+            <hr class="my-4">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-desa-navy px-5">
+                    <i class="fas fa-save me-2"></i>Simpan UMKM
+                </button>
+                <a href="{{ route('admin.umkm') }}" class="btn btn-outline-secondary">Batal</a>
+            </div>
         </form>
     </div>
-
-    <div class="card shadow border-0 rounded-4 p-4">
-        <h4 class="fw-bold mb-4" style="color: #002b5b;">Daftar UMKM Terdaftar</h4>
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nama Usaha</th>
-                        <th>Pemilik</th>
-                        <th>Kategori</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @isset($umkms)
-                        @foreach($umkms as $item)
-                        <tr>
-                            <td>{{ $item->nama_usaha }}</td>
-                            <td>{{ $item->pemilik }}</td>
-                            <td><span class="badge bg-info text-dark">{{ $item->kategori }}</span></td>
-                            <td class="text-center">
-                                <form action="{{ route('admin.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    @endisset
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
-@endsection
+
+@push('styles')
+<style>.text-navy { color: var(--color-6) !important; }</style>
+@endpush
 
 @push('scripts')
 <script>
     var map = L.map('map-input').setView([-7.15539, 112.69323], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
     var marker;
 
     map.on('click', function(e) {
-        if (marker) { map.removeLayer(marker); }
+        if (marker) map.removeLayer(marker);
         marker = L.marker(e.latlng).addTo(map);
-        document.getElementById('lat').value = e.latlng.lat;
-        document.getElementById('lng').value = e.latlng.lng;
+        document.getElementById('lat').value = e.latlng.lat.toFixed(7);
+        document.getElementById('lng').value = e.latlng.lng.toFixed(7);
+    });
+
+    document.getElementById('fotoInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById('previewImg').src = ev.target.result;
+                document.getElementById('fotoPreview').classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('fotoPreview').classList.add('d-none');
+        }
     });
 </script>
 @endpush
+
+@endsection

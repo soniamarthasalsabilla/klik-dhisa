@@ -1,110 +1,244 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    .filter-pill {
+        padding: 6px 18px; border-radius: 50px;
+        border: 2px solid var(--color-3); background: white;
+        color: var(--color-6); font-size: .82rem; font-weight: 600;
+        cursor: pointer; transition: .2s; text-decoration: none; display: inline-block;
+    }
+    .filter-pill:hover { border-color: var(--color-5); color: var(--color-5); }
+    .filter-pill.active { background: var(--color-5); border-color: var(--color-5); color: white; }
+
+    .summary-card {
+        background: white; border-radius: 14px;
+        border: 1px solid var(--color-2);
+        border-left: 5px solid transparent;
+        padding: 20px 22px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+    .summary-card .lbl { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #6c757d; }
+    .summary-card .amount { font-size: 1.4rem; font-weight: 800; line-height: 1.2; margin: 4px 0; }
+    .summary-card .pct { font-size: .78rem; color: #6c757d; }
+
+    .apb-table thead th {
+        background: var(--color-1); color: var(--color-7);
+        font-size: .75rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .4px; padding: 10px 14px; border-bottom: 2px solid var(--color-2);
+    }
+    .apb-table tbody td { font-size: .84rem; padding: 10px 14px; vertical-align: middle; }
+    .apb-table tbody tr:hover { background: var(--color-1); }
+    .apb-table tfoot td {
+        font-weight: 700; font-size: .84rem;
+        background: var(--color-1); border-top: 2px solid var(--color-2);
+        padding: 10px 14px;
+    }
+
+    .jenis-pendapatan { border-left: 3px solid #0d6efd; }
+    .jenis-belanja    { border-left: 3px solid var(--color-5); }
+
+    .progress-bar-teal { background: var(--color-5); }
+</style>
+@endpush
+
 @section('content')
-<section class="py-5" style="background: var(--navy); color: white;">
-    <div class="container text-center pt-5">
-        <h1 class="fw-bold">Transparansi Anggaran</h1>
-        <p class="lead opacity-75">Laporan Pendapatan dan Belanja Desa (APBDes) Tahun Anggaran 2026</p>
+
+{{-- Hero --}}
+<section class="py-3" style="background: white; border-bottom: 3px solid var(--color-5);">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">
+            <i class="fas fa-chart-pie me-2" style="color:var(--color-5);"></i>Transparansi Anggaran
+        </h2>
+        <p class="mb-0" style="color: var(--color-6); font-size: 1rem;">Laporan Anggaran Pendapatan dan Belanja Desa (APBDes)</p>
     </div>
 </section>
 
 <section class="py-5 bg-light">
     <div class="container">
-        
-        <div class="row g-4 mb-5">
+
+        {{-- Filter Tahun --}}
+        <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+            <span class="fw-semibold" style="color:var(--color-7);font-size:.88rem;">Tahun Anggaran:</span>
+            @if($tahunList->isNotEmpty())
+                @foreach($tahunList as $t)
+                <a href="{{ route('transparansi.anggaran', ['tahun'=>$t]) }}"
+                   class="filter-pill {{ $t==$tahun ? 'active' : '' }}">{{ $t }}</a>
+                @endforeach
+            @else
+                <span class="text-muted small">Data belum tersedia</span>
+            @endif
+        </div>
+
+        @if($items->isEmpty())
+        <div class="text-center py-5" style="color:#adb5bd;">
+            <i class="fas fa-file-invoice-dollar fa-4x mb-3 opacity-25 d-block"></i>
+            <p class="mb-0 fw-semibold">Data APBDes tahun {{ $tahun }} belum tersedia.</p>
+        </div>
+        @else
+
+        {{-- Ringkasan --}}
+        <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm p-4 rounded-4 border-start border-primary border-5">
-                    <small class="text-muted fw-bold">TOTAL PENDAPATAN</small>
-                    <h3 class="fw-bold text-primary mt-2">Rp 1.250.000.000</h3>
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                <div class="summary-card" style="border-left-color:#0d6efd;">
+                    <div class="lbl">Total Pendapatan</div>
+                    <div class="amount" style="color:#0d6efd;">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
+                    <div class="progress mt-2" style="height:6px;border-radius:10px;">
+                        <div class="progress-bar" style="width:100%;background:#0d6efd;border-radius:10px;"></div>
                     </div>
+                    <div class="pct mt-1">Target Pendapatan {{ $tahun }}</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm p-4 rounded-4 border-start border-success border-5">
-                    <small class="text-muted fw-bold">TOTAL BELANJA (REALISASI)</small>
-                    <h3 class="fw-bold text-success mt-2">Rp 850.400.000</h3>
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar bg-success" style="width: 68%"></div>
+                <div class="summary-card" style="border-left-color:var(--color-5);">
+                    <div class="lbl">Realisasi Belanja</div>
+                    <div class="amount" style="color:var(--color-5);">Rp {{ number_format($totalRealisasi, 0, ',', '.') }}</div>
+                    <div class="progress mt-2" style="height:6px;border-radius:10px;background:#e9ecef;">
+                        <div class="progress-bar progress-bar-teal" style="width:{{ min($pctRealisasi,100) }}%;border-radius:10px;"></div>
                     </div>
-                    <small class="mt-2 d-block text-muted">Realisasi: 68%</small>
+                    <div class="pct mt-1">{{ $pctRealisasi }}% dari anggaran belanja</div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm p-4 rounded-4 border-start border-warning border-5">
-                    <small class="text-muted fw-bold">SISA ANGGARAN (SILPA)</small>
-                    <h3 class="fw-bold text-warning mt-2">Rp 399.600.000</h3>
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar bg-warning" style="width: 32%"></div>
+                <div class="summary-card" style="border-left-color:var(--gold,#f9d923);">
+                    <div class="lbl">Sisa Anggaran (SiLPA)</div>
+                    @php $siLPApos = max(0, $silpa); @endphp
+                    <div class="amount" style="color:var(--color-7);">Rp {{ number_format($siLPApos, 0, ',', '.') }}</div>
+                    <div class="progress mt-2" style="height:6px;border-radius:10px;background:#e9ecef;">
+                        @php $pctSilpa = $totalPendapatan > 0 ? round(($siLPApos/$totalPendapatan)*100,1) : 0; @endphp
+                        <div class="progress-bar" style="width:{{ min($pctSilpa,100) }}%;background:#f9d923;border-radius:10px;"></div>
+                    </div>
+                    <div class="pct mt-1">{{ $pctSilpa }}% dari total pendapatan</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            {{-- Grafik Distribusi Belanja --}}
+            @if($belanja->isNotEmpty())
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-3 pb-0 px-4">
+                        <h6 class="fw-bold mb-0" style="color:var(--color-7);">
+                            <i class="fas fa-chart-donut me-2" style="color:var(--color-5);"></i>Distribusi Belanja
+                        </h6>
+                    </div>
+                    <div class="card-body p-3">
+                        <canvas id="apbdesChart" style="max-height:260px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Tabel Rincian --}}
+            <div class="col-lg-{{ $belanja->isNotEmpty() ? '7' : '12' }}">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-white border-0 pt-3 pb-0 px-4">
+                        <h6 class="fw-bold mb-0" style="color:var(--color-7);">
+                            <i class="fas fa-table me-2" style="color:var(--color-5);"></i>Rincian Anggaran {{ $tahun }}
+                        </h6>
+                    </div>
+                    <div class="table-responsive mt-2">
+                        <table class="table apb-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Bidang / Kegiatan</th>
+                                    <th>Jenis</th>
+                                    <th class="text-end">Anggaran (Rp)</th>
+                                    <th class="text-end">Realisasi (Rp)</th>
+                                    <th class="text-center">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($items->sortBy('jenis') as $item)
+                                <tr class="{{ $item->jenis==='pendapatan' ? 'jenis-pendapatan' : 'jenis-belanja' }}">
+                                    <td>
+                                        <div class="fw-semibold" style="color:var(--color-7);">{{ $item->bidang }}</div>
+                                        @if($item->kegiatan)<small class="text-muted">{{ $item->kegiatan }}</small>@endif
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill"
+                                              style="background:{{ $item->jenis==='pendapatan' ? '#cfe2ff' : '#E8F5F0' }};
+                                                     color:{{ $item->jenis==='pendapatan' ? '#0d6efd' : 'var(--color-7)' }};
+                                                     font-size:.65rem;">
+                                            {{ ucfirst($item->jenis) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">{{ number_format($item->anggaran, 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ number_format($item->realisasi, 0, ',', '.') }}</td>
+                                    <td class="text-center">
+                                        @php $pct = $item->persentase; @endphp
+                                        <span class="badge rounded-pill"
+                                              style="background:{{ $pct>=75?'#d1e7dd':($pct>=50?'#fff3cd':'#f8d7da') }};
+                                                     color:{{ $pct>=75?'#146c43':($pct>=50?'#664d03':'#842029') }};
+                                                     font-size:.7rem;">
+                                            {{ $pct }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" style="color:var(--color-7);">Total Anggaran</td>
+                                    <td class="text-end" style="color:var(--color-7);">{{ number_format($totalAnggaran + $totalPendapatan, 0, ',', '.') }}</td>
+                                    <td class="text-end" style="color:var(--color-5);">{{ number_format($totalRealisasi, 0, ',', '.') }}</td>
+                                    <td class="text-center" style="color:var(--color-5);">{{ $pctRealisasi }}%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 p-4">
-            <h5 class="fw-bold mb-4"><i class="fas fa-list-ul me-2 text-primary"></i> Rincian Bidang Pelaksanaan</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="py-3 px-3">Bidang / Kegiatan</th>
-                            <th class="py-3">Anggaran (Rp)</th>
-                            <th class="py-3">Realisasi (Rp)</th>
-                            <th class="py-3 text-center">Persentase</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="px-3 fw-bold">Penyelenggaraan Pemerintahan Desa</td>
-                            <td>450.000.000</td>
-                            <td>315.000.000</td>
-                            <td class="text-center">
-                                <span class="badge bg-soft-primary text-primary px-3">70%</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3 fw-bold">Pembangunan Desa (Infrastruktur)</td>
-                            <td>550.000.000</td>
-                            <td>412.500.000</td>
-                            <td class="text-center">
-                                <span class="badge bg-soft-success text-success px-3">75%</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3 fw-bold">Pembinaan Kemasyarakatan</td>
-                            <td>150.000.000</td>
-                            <td>80.000.000</td>
-                            <td class="text-center">
-                                <span class="badge bg-soft-info text-info px-3">53%</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3 fw-bold">Pemberdayaan Masyarakat (UMKM)</td>
-                            <td>100.000.000</td>
-                            <td>42.900.000</td>
-                            <td class="text-center">
-                                <span class="badge bg-soft-warning text-warning px-3">42.9%</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="mt-4 p-3 bg-light rounded-3 d-flex align-items-center">
-                <i class="fas fa-info-circle text-primary me-3 fs-4"></i>
-                <small class="text-muted">Data ini diperbarui secara berkala sesuai dengan laporan realisasi bulanan Bendahara Desa Tajungan.</small>
-            </div>
+        {{-- Footer Note --}}
+        <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:var(--color-1);border:1px solid var(--color-2);">
+            <i class="fas fa-info-circle mt-1" style="color:var(--color-5);"></i>
+            <small style="color:var(--color-6);line-height:1.6;">
+                Data diperbarui secara berkala sesuai laporan realisasi Bendahara Desa Tajungan. Tahun Anggaran {{ $tahun }}.
+                Untuk pertanyaan, hubungi Kaur Keuangan Desa Tajungan.
+            </small>
         </div>
 
+        @endif
     </div>
 </section>
 
-<style>
-    .bg-soft-primary { background-color: rgba(0, 43, 91, 0.1); }
-    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); }
-    .bg-soft-info { background-color: rgba(13, 202, 240, 0.1); }
-    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); }
-    .table thead th { font-size: 0.85rem; letter-spacing: 0.5px; }
-</style>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@if($belanja->isNotEmpty())
+<script>
+var tealColors = ['#1E5A52','#3A9A8C','#5BBFAB','#8FD4C2','#B5E3DA','#0d6efd','#6f42c1','#fd7e14'];
+new Chart(document.getElementById('apbdesChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        labels: {!! $chartLabels !!},
+        datasets: [{
+            data: {!! $chartData !!},
+            backgroundColor: tealColors,
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '60%',
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 11, family: 'Poppins' }, padding: 10 } },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        var val = ctx.raw;
+                        return ' Rp ' + val.toLocaleString('id-ID');
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+@endif
+@endpush
+
 @endsection

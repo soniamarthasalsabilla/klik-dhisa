@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="py-5" style="background: var(--navy); color: white;">
-    <div class="container text-center pt-5">
-        <h1 class="fw-bold text-white">Peta UMKM Desa</h1>
-        <p class="lead opacity-75">Potensi Ekonomi Lokal Desa Tajungan</p>
+<section class="py-3" style="background: white; border-bottom: 3px solid var(--color-5);">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">Peta UMKM Desa</h2>
+        <p class="mb-0" style="color: var(--color-6); font-size: 1rem;">Potensi Ekonomi Lokal Desa Tajungan</p>
     </div>
 </section>
 
@@ -27,8 +27,15 @@
                         @isset($semua_umkm)
                             @foreach($semua_umkm as $umkm)
                             <button onclick="focusMap({{ $umkm->latitude }}, {{ $umkm->longitude }}, '{{ addslashes($umkm->nama_usaha) }}')" 
-                                    class="nav-link text-start mb-2 py-3 shadow-sm umkm-item border" 
+                                    class="nav-link text-start mb-2 py-2 shadow-sm umkm-item border" 
                                     type="button" style="background: white;">
+                                @if($umkm->foto)
+                                    <img src="{{ asset('storage/' . $umkm->foto) }}" alt="{{ $umkm->nama_usaha }}" class="img-fluid rounded-2 mb-2" style="height: 80px; width: 100%; object-fit: cover;">
+                                @else
+                                    <div class="bg-light rounded-2 mb-2 d-flex align-items-center justify-content-center" style="height: 80px; font-size: 12px; color: #999;">
+                                        <i class="fas fa-image me-1"></i> Tidak ada foto
+                                    </div>
+                                @endif
                                 <i class="fas fa-store me-2"></i> {{ $umkm->nama_usaha }}
                                 <div class="small opacity-50 ms-4" style="font-size: 10px;">{{ $umkm->pemilik }}</div>
                             </button>
@@ -96,7 +103,10 @@
                 });
 
                 var popupContent = `
-                    <div style="min-width: 150px;">
+                    <div style="min-width: 200px;">
+                        @if($umkm->foto)
+                        <img src="{{ asset('storage/' . $umkm->foto) }}" alt="{{ $umkm->nama_usaha }}" class="img-fluid rounded-2 mb-2" style="width: 100%; height: 150px; object-fit: cover;">
+                        @endif
                         <h6 class="fw-bold mb-1" style="color:var(--navy);">{{ $umkm->nama_usaha }}</h6>
                         <p class="small text-muted mb-2"><i class="fas fa-tag me-1"></i> {{ $umkm->kategori }}</p>
                         <hr class="my-2">

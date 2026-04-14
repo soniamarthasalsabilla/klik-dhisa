@@ -5,18 +5,90 @@ use App\Models\Umkm;
 use App\Models\Statistic;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DesaController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PamongController;
+use App\Http\Controllers\GaleriController;
+use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\ApbdesController;
+use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\AsetDesaController;
+
+// Auth Routes
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Protected Admin Routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/umkm', [AdminController::class, 'manage'])->name('admin.umkm');
+    Route::get('/admin/create', [AdminController::class, 'create'])->name('admin.create');
+    Route::post('/admin/simpan', [AdminController::class, 'store'])->name('admin.store');
+    Route::get('/admin/umkm/edit/{id}', [AdminController::class, 'edit'])->name('admin.umkm.edit');
+    Route::put('/admin/umkm/update/{id}', [AdminController::class, 'update'])->name('admin.umkm.update');
+    Route::delete('/admin/hapus/{id}', [AdminController::class, 'destroy'])->name('admin.destroy');
+
+    Route::get('/admin/content/{section}', [AdminController::class, 'manageContent'])->name('admin.content.manage');
+    Route::get('/admin/content/{section}/tambah', [AdminController::class, 'createContent'])->name('admin.content.create');
+    Route::post('/admin/content/{section}/simpan', [AdminController::class, 'storeContent'])->name('admin.content.store');
+    Route::get('/admin/content/{section}/edit/{id}', [AdminController::class, 'editContent'])->name('admin.content.edit');
+    Route::put('/admin/content/{section}/update/{id}', [AdminController::class, 'updateContent'])->name('admin.content.update');
+    Route::delete('/admin/content/{section}/hapus/{id}', [AdminController::class, 'destroyContent'])->name('admin.content.destroy');
+
+    Route::get('/admin/statistik', [AdminController::class, 'manageStatistics'])->name('admin.statistik');
+    Route::get('/admin/statistik/tambah', [AdminController::class, 'createStatistic'])->name('admin.statistik.create');
+    Route::post('/admin/statistik/simpan', [AdminController::class, 'storeStatistic'])->name('admin.statistik.store');
+    Route::get('/admin/statistik/edit/{id}', [AdminController::class, 'editStatistic'])->name('admin.statistik.edit');
+    Route::put('/admin/statistik/update/{id}', [AdminController::class, 'updateStatistic'])->name('admin.statistik.update');
+    Route::delete('/admin/statistik/hapus/{id}', [AdminController::class, 'destroyStatistic'])->name('admin.statistik.destroy');
+    Route::post('/admin/statistik/import', [AdminController::class, 'importStatistics'])->name('admin.statistik.import');
+    Route::put('/admin/statistik/update-multiple', [AdminController::class, 'updateMultipleStatistics'])->name('admin.statistik.updateMultiple');
+    Route::get('/admin/statistik/export/{kategori}', [AdminController::class, 'exportStatistics'])->name('admin.statistik.export');
+
+    // Profil Desa Settings
+    Route::get('/admin/profil-desa', [AdminController::class, 'profilDesa'])->name('admin.profil_desa');
+    Route::put('/admin/profil-desa/update', [AdminController::class, 'updateProfilDesa'])->name('admin.profil_desa.update');
+
+    // Pamong
+    Route::resource('/admin/pamong', PamongController::class, ['as' => 'admin'])->except(['show']);
+
+    // Galeri
+    Route::resource('/admin/galeri', GaleriController::class, ['as' => 'admin'])->except(['show']);
+
+    // Artikel
+    Route::resource('/admin/artikel', ArtikelController::class, ['as' => 'admin'])->except(['show']);
+
+    // APBDes
+    Route::resource('/admin/apbdes', ApbdesController::class, ['as' => 'admin'])->except(['show']);
+
+    // Agenda
+    Route::resource('/admin/agenda', AgendaController::class, ['as' => 'admin'])->except(['show']);
+
+    // Aset Desa
+    Route::resource('/admin/aset', AsetDesaController::class, ['as' => 'admin'])->except(['show']);
+
+    // Kelola Peta
+    Route::get('/admin/peta', [AdminController::class, 'kelolapeta'])->name('admin.peta');
+    Route::patch('/admin/peta/umkm/{id}', [AdminController::class, 'updateKoordinatUmkm'])->name('admin.peta.umkm');
+    Route::patch('/admin/peta/aset/{id}', [AdminController::class, 'updateKoordinatAset'])->name('admin.peta.aset');
+
+    // Pengaduan
+    Route::get('/admin/pengaduan', [PengaduanController::class, 'adminIndex'])->name('admin.pengaduan.index');
+    Route::get('/admin/pengaduan/{pengaduan}', [PengaduanController::class, 'adminShow'])->name('admin.pengaduan.show');
+    Route::patch('/admin/pengaduan/{pengaduan}', [PengaduanController::class, 'adminUpdate'])->name('admin.pengaduan.update');
+    Route::delete('/admin/pengaduan/{pengaduan}', [PengaduanController::class, 'adminDestroy'])->name('admin.pengaduan.destroy');
+});
 
 // 1. Halaman Depan
 Route::get('/', function () {
     $semua_umkm = Umkm::all();
     $data_pendidikan = Statistic::where('kategori', 'Pendidikan')->get();
-    return view('welcome', compact('semua_umkm', 'data_pendidikan'));
+    $kades = \App\Models\PageContent::where('section', 'kades')->where('is_active', true)->first();
+    $berita_terkini = \App\Models\Artikel::where('is_active', true)->orderByDesc('published_at')->take(3)->get();
+    $agenda_terkini = \App\Models\Agenda::aktif()->mendatang()->take(3)->get();
+    return view('welcome', compact('semua_umkm', 'data_pendidikan', 'kades', 'berita_terkini', 'agenda_terkini'));
 });
-
-// 2. Halaman Admin (UMKM)
-Route::get('/admin', [AdminController::class, 'create'])->name('admin.create');
-Route::post('/admin/simpan', [AdminController::class, 'store'])->name('admin.store');
-Route::delete('/admin/hapus/{id}', [AdminController::class, 'destroy'])->name('admin.destroy');
 
 // 3. RUTE DROPDOWN
 Route::get('/informasi-publik', [DesaController::class, 'informasi'])->name('informasi.publik');
@@ -30,3 +102,21 @@ Route::get('/statistik-bantuan', [DesaController::class, 'statBantuan'])->name('
 
 // UMKM Peta (Halaman Publik)
 Route::get('/umkm-desa', [AdminController::class, 'index'])->name('umkm.desa');
+
+// Fase 2 - Halaman Publik Baru
+Route::get('/profil-desa', [DesaController::class, 'profilDesa'])->name('profil.desa');
+Route::get('/struktur-organisasi', [DesaController::class, 'strukturOrganisasi'])->name('struktur.organisasi');
+Route::get('/galeri-foto', [DesaController::class, 'galeri'])->name('galeri.desa');
+Route::get('/berita', [DesaController::class, 'berita'])->name('berita.desa');
+Route::get('/berita/{artikel:slug}', [DesaController::class, 'beritaDetail'])->name('berita.detail');
+
+// Aset Desa Publik
+Route::get('/aset-desa', [DesaController::class, 'asetDesa'])->name('aset.desa');
+
+// Peta Tematik
+Route::get('/peta-desa', [DesaController::class, 'petaDesa'])->name('peta.desa');
+
+// Fase 3 - Transparansi & Partisipasi
+Route::get('/agenda', [DesaController::class, 'agenda'])->name('agenda.desa');
+Route::get('/pengaduan', [PengaduanController::class, 'form'])->name('pengaduan.form');
+Route::post('/pengaduan/kirim', [PengaduanController::class, 'submit'])->name('pengaduan.submit');
