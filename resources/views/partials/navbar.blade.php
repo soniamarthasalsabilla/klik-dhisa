@@ -1,15 +1,30 @@
+@php
+    $navLogo     = \App\Models\DesaSetting::get('logo_desa');
+    $navNamaDesa = \App\Models\DesaSetting::get('nama_navbar');
+@endphp
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm py-3" style="background-color: var(--color-7) !important;">
     <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2 fs-3" href="/">
-            <i class="fas fa-landmark text-warning"></i> 
-            <span class="serif-title" style="color: white !important;">Dhisâ</span>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
+            {{-- Logo desa jika diupload, fallback ke ikon --}}
+            @if($navLogo)
+                <img src="{{ asset('storage/'.$navLogo) }}" alt="Logo Desa"
+                     style="height:38px;width:auto;object-fit:contain;flex-shrink:0;">
+            @else
+                <i class="fas fa-landmark text-warning" style="font-size:1.7rem;flex-shrink:0;"></i>
+            @endif
+
+            {{-- "Dhisâ" permanen + nama desa sejajar di sampingnya --}}
+            <span class="serif-title fw-bold" style="font-size:1.25rem;color:#fff;">Dhis&#xE2;</span>
+            @if($navNamaDesa)
+                <span class="serif-title" style="font-size:1.25rem;color:rgba(255,255,255,0.85);font-weight:700;">{{ $navNamaDesa }}</span>
+            @endif
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center gap-2">
-                <li class="nav-item"><a class="nav-link px-3 active rounded-pill" href="/">Beranda</a></li>
+                <li class="nav-item"><a class="nav-link px-3 active rounded-pill" href="{{ route('home') }}">Beranda</a></li>
                 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle px-3 text-white" href="#" data-bs-toggle="dropdown">Profil Desa</a>
@@ -19,6 +34,7 @@
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('aset.desa') }}"><i class="fas fa-building me-2"></i> Aset Desa</a></li>
                         <li><hr class="dropdown-divider border-secondary opacity-25 my-1"></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('informasi.publik') }}"><i class="fas fa-file-invoice me-2"></i> Informasi Publik</a></li>
+                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('arsip.artikel') }}"><i class="fas fa-archive me-2"></i> Arsip Dokumen</a></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('transparansi.anggaran') }}"><i class="fas fa-coins me-2"></i> Transparansi Anggaran</a></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('layanan.desa') }}"><i class="fas fa-headset me-2"></i> Layanan Desa</a></li>
                     </ul>
@@ -48,7 +64,7 @@
 </nav>
 
 <style>
-    /* Styling dropdown tambahan untuk navbar baru */
+
     .navbar-dark .navbar-nav .nav-link:hover { color: var(--gold) !important; }
     .navbar-dark .navbar-nav .active { background-color: rgba(255,255,255,0.1); color: #fff !important; }
     

@@ -156,9 +156,17 @@
                         <p class="text-muted small mb-3 flex-grow-1" style="font-size:.8rem;line-height:1.5;">
                             {{ $item->excerpt }}
                         </p>
-                        <div class="d-flex align-items-center gap-1 mt-auto" style="color:var(--color-5);font-size:.78rem;font-weight:600;">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Lihat syarat &amp; prosedur</span>
+                        <div class="d-flex align-items-center justify-content-between mt-auto flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-1" style="color:var(--color-5);font-size:.78rem;font-weight:600;">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Lihat syarat &amp; prosedur</span>
+                            </div>
+                            <a href="https://forms.gle/6yRkiPhwBz3dVktG6" target="_blank"
+                               class="btn btn-sm rounded-pill fw-bold px-3"
+                               style="background:var(--color-5);color:white;font-size:.72rem;"
+                               onclick="event.stopPropagation();">
+                                <i class="fas fa-file-signature me-1"></i>Ajukan Surat
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -243,7 +251,11 @@ $katConfig2 = [
                     </small>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
+            <div class="modal-footer border-0 pt-0 gap-2 flex-wrap">
+                <a href="https://forms.gle/6yRkiPhwBz3dVktG6" target="_blank"
+                   class="btn btn-sm rounded-pill px-3 fw-bold" style="background:var(--gold);color:var(--color-7);">
+                    <i class="fas fa-file-signature me-1"></i>Ajukan via Google Form
+                </a>
                 <a href="{{ route('pengaduan.form') }}" class="btn btn-sm rounded-pill px-3" style="background:var(--color-5);color:white;">
                     <i class="fas fa-comment-dots me-1"></i>Butuh Bantuan?
                 </a>

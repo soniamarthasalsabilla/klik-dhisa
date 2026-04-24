@@ -57,6 +57,18 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label fw-semibold">Alamat</label>
+                        <input type="text" name="alamat" class="form-control"
+                               value="{{ old('alamat') }}" placeholder="contoh: RT 03 RW 01">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Dusun</label>
+                        <input type="text" name="dusun" class="form-control"
+                               value="{{ old('dusun') }}" placeholder="contoh: Dusun Barat">
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">Foto Usaha</label>
                         <input type="file" name="foto" class="form-control" accept="image/*" id="fotoInput">
                         <small class="text-muted">JPG, PNG (Maks. 2MB)</small>
@@ -106,9 +118,14 @@
 @push('scripts')
 <script>
     var map = L.map('map-input').setView([-7.15539, 112.69323], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+    var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+    });
+    var satelitLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '© Esri World Imagery', maxZoom: 19
+    });
+    streetLayer.addTo(map);
+    L.control.layers({ 'Peta': streetLayer, 'Satelit': satelitLayer }, {}, { position: 'topright' }).addTo(map);
     var marker;
 
     map.on('click', function(e) {

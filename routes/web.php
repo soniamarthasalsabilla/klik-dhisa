@@ -13,6 +13,11 @@ use App\Http\Controllers\ApbdesController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PengaduanController;
 use App\Http\Controllers\AsetDesaController;
+use App\Http\Controllers\PortalController;
+use App\Http\Controllers\LogController;
+
+// Portal Satu Pintu
+Route::get('/portal', [PortalController::class, 'index'])->name('portal');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -28,6 +33,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/umkm/edit/{id}', [AdminController::class, 'edit'])->name('admin.umkm.edit');
     Route::put('/admin/umkm/update/{id}', [AdminController::class, 'update'])->name('admin.umkm.update');
     Route::delete('/admin/hapus/{id}', [AdminController::class, 'destroy'])->name('admin.destroy');
+    Route::post('/admin/umkm/import', [AdminController::class, 'importCsv'])->name('admin.umkm.import');
+    Route::get('/admin/umkm/template', [AdminController::class, 'downloadTemplateCsv'])->name('admin.umkm.template');
 
     Route::get('/admin/content/{section}', [AdminController::class, 'manageContent'])->name('admin.content.manage');
     Route::get('/admin/content/{section}/tambah', [AdminController::class, 'createContent'])->name('admin.content.create');
@@ -46,9 +53,17 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/statistik/update-multiple', [AdminController::class, 'updateMultipleStatistics'])->name('admin.statistik.updateMultiple');
     Route::get('/admin/statistik/export/{kategori}', [AdminController::class, 'exportStatistics'])->name('admin.statistik.export');
 
+    // Tampilan Beranda
+    Route::get('/admin/tampilan-beranda', [AdminController::class, 'tampilanBeranda'])->name('admin.tampilan_beranda');
+    Route::post('/admin/tampilan-beranda/update', [AdminController::class, 'updateTampilanBeranda'])->name('admin.tampilan_beranda.update');
+
     // Profil Desa Settings
     Route::get('/admin/profil-desa', [AdminController::class, 'profilDesa'])->name('admin.profil_desa');
     Route::put('/admin/profil-desa/update', [AdminController::class, 'updateProfilDesa'])->name('admin.profil_desa.update');
+
+    // Profil Kades
+    Route::get('/admin/profil-kades', [AdminController::class, 'profilKades'])->name('admin.profil_kades');
+    Route::post('/admin/profil-kades/update', [AdminController::class, 'updateProfilKades'])->name('admin.profil_kades.update');
 
     // Pamong
     Route::resource('/admin/pamong', PamongController::class, ['as' => 'admin'])->except(['show']);
@@ -73,22 +88,46 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/peta/umkm/{id}', [AdminController::class, 'updateKoordinatUmkm'])->name('admin.peta.umkm');
     Route::patch('/admin/peta/aset/{id}', [AdminController::class, 'updateKoordinatAset'])->name('admin.peta.aset');
 
+    // Batas Dusun
+    Route::get('/admin/batas-dusun', [AdminController::class, 'batasDusunIndex'])->name('admin.batas_dusun.index');
+    Route::post('/admin/batas-dusun', [AdminController::class, 'batasDusunStore'])->name('admin.batas_dusun.store');
+    Route::put('/admin/batas-dusun/{id}', [AdminController::class, 'batasDusunUpdate'])->name('admin.batas_dusun.update');
+    Route::delete('/admin/batas-dusun/{id}', [AdminController::class, 'batasDusunDestroy'])->name('admin.batas_dusun.destroy');
+
     // Pengaduan
     Route::get('/admin/pengaduan', [PengaduanController::class, 'adminIndex'])->name('admin.pengaduan.index');
     Route::get('/admin/pengaduan/{pengaduan}', [PengaduanController::class, 'adminShow'])->name('admin.pengaduan.show');
     Route::patch('/admin/pengaduan/{pengaduan}', [PengaduanController::class, 'adminUpdate'])->name('admin.pengaduan.update');
     Route::delete('/admin/pengaduan/{pengaduan}', [PengaduanController::class, 'adminDestroy'])->name('admin.pengaduan.destroy');
+
+    // Log & Riwayat
+    Route::get('/admin/log', [LogController::class, 'index'])->name('admin.log.index');
+    Route::delete('/admin/log/visitors', [LogController::class, 'clearVisitors'])->name('admin.log.clearVisitors');
+    Route::delete('/admin/log/activities', [LogController::class, 'clearActivities'])->name('admin.log.clearActivities');
+
+    // Kontak Darurat (dikelola dari halaman Informasi Publik)
+    Route::post('/admin/kontak-darurat',                  [AdminController::class, 'storeKontak'])->name('admin.kontak_darurat.store');
+    Route::put('/admin/kontak-darurat/{kontak}',          [AdminController::class, 'updateKontak'])->name('admin.kontak_darurat.update');
+    Route::patch('/admin/kontak-darurat/{kontak}/toggle', [AdminController::class, 'toggleKontak'])->name('admin.kontak_darurat.toggle');
+    Route::delete('/admin/kontak-darurat/{kontak}',       [AdminController::class, 'destroyKontak'])->name('admin.kontak_darurat.destroy');
 });
 
 // 1. Halaman Depan
-Route::get('/', function () {
+Route::get('/', fn() => redirect()->route('portal'));
+
+Route::get('/home', function () {
     $semua_umkm = Umkm::all();
     $data_pendidikan = Statistic::where('kategori', 'Pendidikan')->get();
     $kades = \App\Models\PageContent::where('section', 'kades')->where('is_active', true)->first();
     $berita_terkini = \App\Models\Artikel::where('is_active', true)->orderByDesc('published_at')->take(3)->get();
     $agenda_terkini = \App\Models\Agenda::aktif()->mendatang()->take(3)->get();
-    return view('welcome', compact('semua_umkm', 'data_pendidikan', 'kades', 'berita_terkini', 'agenda_terkini'));
-});
+    $kontak = \App\Models\DesaSetting::pluck('value', 'key');
+    $batasDesa     = \App\Models\BatasDusun::where('tipe', 'desa')->first();
+    $batasDusun    = \App\Models\BatasDusun::where('tipe', 'dusun')->where('is_active', true)->orderBy('nama_dusun')->get();
+    $asets         = \App\Models\AsetDesa::where('is_active', true)->whereNotNull('latitude')->whereNotNull('longitude')->get();
+    $kontakDarurat = \App\Models\KontakDarurat::where('is_active', true)->orderBy('urutan')->orderBy('id')->get();
+    return view('welcome', compact('semua_umkm', 'data_pendidikan', 'kades', 'berita_terkini', 'agenda_terkini', 'kontak', 'batasDesa', 'batasDusun', 'asets', 'kontakDarurat'));
+})->name('home');
 
 // 3. RUTE DROPDOWN
 Route::get('/informasi-publik', [DesaController::class, 'informasi'])->name('informasi.publik');
@@ -115,6 +154,11 @@ Route::get('/aset-desa', [DesaController::class, 'asetDesa'])->name('aset.desa')
 
 // Peta Tematik
 Route::get('/peta-desa', [DesaController::class, 'petaDesa'])->name('peta.desa');
+
+// API publik batas dusun (untuk peta)
+Route::get('/api/batas-dusun', function () {
+    return response()->json(\App\Models\BatasDusun::where('is_active', true)->get());
+});
 
 // Fase 3 - Transparansi & Partisipasi
 Route::get('/agenda', [DesaController::class, 'agenda'])->name('agenda.desa');

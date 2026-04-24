@@ -45,10 +45,22 @@
                             <i class="far fa-calendar-alt me-2"></i> {{ $item->year ?? '-' }}
                         </div>
                         <h5 class="fw-bold mb-3 lh-base article-title">
-                            <a href="{{ $item->link ?: '#' }}" class="text-decoration-none text-dark hover-gold" target="_blank">{{ $item->title }}</a>
+                            @if($item->link)
+                                <a href="{{ $item->link }}" class="text-decoration-none text-dark hover-gold" target="_blank">{{ $item->title }}</a>
+                            @else
+                                <span class="text-dark">{{ $item->title }}</span>
+                            @endif
                         </h5>
                         <p class="text-muted small mb-4">{{ $item->excerpt ?: 'Tidak ada ringkasan tersedia.' }}</p>
-                        <a href="{{ $item->link ?: '#' }}" class="btn btn-link text-primary fw-bold p-0 text-decoration-none" target="_blank">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
+                        @if($item->link)
+                            <a href="{{ $item->link }}" class="btn btn-link text-primary fw-bold p-0 text-decoration-none" target="_blank">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
+                        @elseif($item->file)
+                            <a href="{{ asset('storage/'.$item->file) }}" class="btn btn-link text-primary fw-bold p-0 text-decoration-none" target="_blank">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></a>
+                        @elseif($item->body)
+                            <button type="button" class="btn btn-link text-primary fw-bold p-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#modal-arsip-{{ $loop->index }}">Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i></button>
+                        @else
+                            <span class="text-muted small"><i class="fas fa-clock me-1"></i>Konten belum tersedia</span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -85,6 +97,32 @@
     .pagination .page-link { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--navy); border: none; }
     .filter-btn.active { background: var(--navy) !important; color: white !important; border-color: var(--navy) !important; }
 </style>
+
+{{-- Modal di luar section agar tidak terhalang stacking context --}}
+@foreach($items as $item)
+    @if($item->body && !$item->link && !$item->file)
+    <div class="modal fade" id="modal-arsip-{{ $loop->index }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color:var(--color-7,#1E5A52);">{{ $item->title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-2">
+                    @if($item->year)
+                        <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ $item->year }}</small>
+                        <hr class="my-3">
+                    @endif
+                    <div style="line-height:1.8;">{!! nl2br(e($item->body)) !!}</div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+@endforeach
 
 @push('scripts')
 <script>

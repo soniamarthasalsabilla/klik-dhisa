@@ -10,5 +10,5 @@ class Umkm extends Model
     use HasFactory;
 
     // Tambahkan baris ini untuk mengizinkan kolom diisi
-    protected $fillable = ['nama_usaha', 'pemilik', 'kategori', 'no_hp', 'latitude', 'longitude', 'foto'];
+    protected $fillable = ['nama_usaha', 'pemilik', 'kategori', 'no_hp', 'alamat', 'dusun', 'latitude', 'longitude', 'foto'];
 }

@@ -139,10 +139,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 formFields.innerHTML = '<p class="text-muted text-center py-4">Belum ada data untuk kategori ini.</p>';
             } else {
                 filtered.forEach(stat => {
+                    const editUrl   = `/admin/statistik/edit/${stat.id}`;
+                    const deleteUrl = `/admin/statistik/hapus/${stat.id}`;
                     const div = document.createElement('div');
                     div.className = 'mb-3 p-3 bg-light rounded-3 border';
                     div.innerHTML = `
-                        <label class="form-label fw-semibold small text-muted mb-2">${stat.label}</label>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-semibold small text-muted mb-0">${stat.label}</label>
+                            <div class="d-flex gap-1">
+                                <a href="${editUrl}" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size:.75rem;" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="POST" action="${deleteUrl}" onsubmit="return confirm('Hapus data ${stat.label}?');" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size:.75rem;" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                         <div class="row align-items-center g-2">
                             <div class="col-8">
                                 <input type="text" class="form-control form-control-sm" value="${stat.label}" readonly>

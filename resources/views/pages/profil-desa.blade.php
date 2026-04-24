@@ -57,7 +57,6 @@
 
 @section('content')
 
-{{-- Hero --}}
 <section class="py-3" style="background: white; border-bottom: 3px solid var(--color-5);">
     <div class="container text-center py-4">
         <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">
@@ -78,15 +77,19 @@
         </div>
         @else
 
-        {{-- Statistik Singkat --}}
         <div class="row g-3 mb-4">
-            @php $cards = [
+            @php
+            $rtVal  = ($settings['jumlah_rt']  ?? 0) > 0 ? $settings['jumlah_rt']  : '–';
+            $rwVal  = ($settings['jumlah_rw']  ?? 0) > 0 ? $settings['jumlah_rw']  : '–';
+            $cards = [
                 ['icon'=>'fa-ruler-combined','val'=>($settings['luas_wilayah'] ?? '145'),'sat'=>'Ha','label'=>'Luas Wilayah'],
                 ['icon'=>'fa-users','val'=>number_format($settings['jumlah_penduduk'] ?? 2450, 0, ',', '.'),'sat'=>'Jiwa','label'=>'Total Penduduk'],
                 ['icon'=>'fa-home','val'=>number_format($settings['jumlah_kk'] ?? 650, 0, ',', '.'),'sat'=>'KK','label'=>'Kepala Keluarga'],
-                ['icon'=>'fa-map-signs','val'=>($settings['jumlah_rt'] ?? '12').' / '.($settings['jumlah_rw'] ?? '4'),'sat'=>'','label'=>'RT / RW'],
+                ['icon'=>'fa-map-marker-alt','val'=>($jumlahDusun ?: '–'),'sat'=>'','label'=>'Jumlah Dusun'],
+                ['icon'=>'fa-map-signs','val'=>$rwVal.' / '.$rtVal,'sat'=>'','label'=>'RW / RT'],
                 ['icon'=>'fa-calendar-check','val'=>($settings['tahun_berdiri'] ?? '1945'),'sat'=>'','label'=>'Tahun Berdiri'],
-            ]; @endphp
+            ];
+        @endphp
             @foreach($cards as $c)
             <div class="col-6 col-md-4 col-lg">
                 <div class="stat-card h-100">
@@ -149,6 +152,38 @@
                             <i class="fas {{ $ic }}" style="color:var(--color-5);"></i>
                             <div class="batas-label">{{ $label }}</div>
                             <div style="font-size:.88rem;color:#444;">{{ $settings['batas_'.$key] }}</div>
+                        </div>
+                    </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- Jarak ke Kantor --}}
+        @if(!empty($settings['jarak_kecamatan']) || !empty($settings['jarak_kabupaten']) || !empty($settings['jarak_provinsi']))
+        <div class="section-card mb-4">
+            <div class="section-title">
+                <div class="title-icon"><i class="fas fa-road"></i></div>
+                <span>Jarak ke Pusat Pemerintahan</span>
+            </div>
+            <div class="row g-3">
+                @foreach([
+                    ['jarak_kecamatan','Kantor Kecamatan','fa-building','Kec. Kamal'],
+                    ['jarak_kabupaten','Kantor Kabupaten','fa-city','Kab. Bangkalan'],
+                    ['jarak_provinsi','Kantor Provinsi','fa-landmark','Prov. Jawa Timur'],
+                ] as [$key,$label,$ic,$sub])
+                    @if(!empty($settings[$key]))
+                    <div class="col-md-4">
+                        <div class="batas-item justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas {{ $ic }}" style="color:var(--color-5);"></i>
+                                <div>
+                                    <div class="batas-label">{{ $label }}</div>
+                                    <div style="font-size:.75rem;color:#888;">{{ $sub }}</div>
+                                </div>
+                            </div>
+                            <span class="fw-bold" style="color:var(--color-7);font-size:1rem;">{{ $settings[$key] }} <span style="font-size:.75rem;font-weight:400;color:#888;">km</span></span>
                         </div>
                     </div>
                     @endif

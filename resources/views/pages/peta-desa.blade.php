@@ -78,6 +78,14 @@
         text-decoration: none; font-weight: 600;
     }
     .popup-wa:hover { background: #1da851; color: white; }
+    .popup-nav {
+        display: block; text-align: center;
+        background: #0d6efd; color: white;
+        padding: 6px; border-radius: 6px;
+        margin-top: 6px; font-size: .78rem;
+        text-decoration: none; font-weight: 600;
+    }
+    .popup-nav:hover { background: #0b5ed7; color: white; }
 
     /* ===== FILTER CHIPS ===== */
     .chip-group { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
@@ -98,6 +106,7 @@
     .peta-list { max-height: 320px; overflow-y: auto; padding-right: 2px; }
     .peta-list::-webkit-scrollbar { width: 4px; }
     .peta-list::-webkit-scrollbar-thumb { background: var(--color-3); border-radius: 4px; }
+    .peta-item.active { background: var(--color-1); border-color: var(--color-5); }
 
     /* ===== TABS ===== */
     .peta-tab-nav .nav-link {
@@ -185,13 +194,7 @@
             </div>
             <div class="col-6 col-md-3">
                 <div class="peta-stat">
-                    <div class="sv">6</div>
-                    <div class="sl"><i class="fas fa-landmark me-1"></i>Fasilitas</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="peta-stat">
-                    <div class="sv">3</div>
+                    <div class="sv">{{ $batasDusun->count() }}</div>
                     <div class="sl"><i class="fas fa-map me-1"></i>Dusun</div>
                 </div>
             </div>
@@ -245,11 +248,6 @@
                                 <hr class="my-2">
                                 <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;font-weight:700;letter-spacing:1px;">Titik Lokasi</p>
 
-                                <div class="layer-row" onclick="toggleLayer('fasilitas')">
-                                    <div class="layer-dot" style="background:var(--color-7);"></div>
-                                    <span>Kantor &amp; Fasilitas</span>
-                                    <div class="layer-toggle on" id="toggle-fasilitas"></div>
-                                </div>
                                 <div class="layer-row" onclick="toggleLayer('aset')">
                                     <div class="layer-dot" style="background:#0d6efd;"></div>
                                     <span>Aset Desa</span>
@@ -261,14 +259,16 @@
                                     <div class="layer-toggle on" id="toggle-umkm"></div>
                                 </div>
 
+                                @if($batasDusun->count())
                                 <hr class="my-2">
                                 <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;font-weight:700;letter-spacing:1px;">Legenda Dusun</p>
-                                @foreach([['#5b9bd5','Dusun Barat'],['#70c95e','Dusun Tengah'],['#e8a838','Dusun Timur']] as [$c,$n])
+                                @foreach($batasDusun as $d)
                                 <div class="d-flex align-items-center gap-2 mb-1 px-2" style="font-size:.78rem;color:var(--color-7);">
-                                    <div class="layer-dot" style="background:{{ $c }};"></div>
-                                    <span>{{ $n }}</span>
+                                    <div class="layer-dot" style="background:{{ $d->warna }};"></div>
+                                    <span>{{ $d->nama_dusun }}</span>
                                 </div>
                                 @endforeach
+                                @endif
 
                                 <hr class="my-2">
                                 <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;font-weight:700;letter-spacing:1px;">Legenda UMKM</p>
@@ -295,11 +295,12 @@
                                     <div class="peta-item umkm-item"
                                          data-kat="{{ $u->kategori }}"
                                          data-nama="{{ strtolower($u->nama_usaha) }}"
-                                         onclick="flyTo({{ $u->latitude }}, {{ $u->longitude }})">
+                                         onclick="flyToItem('umkm', {{ $loop->index }})">
                                         <div class="pi-name">{{ $u->nama_usaha }}</div>
                                         <div class="pi-sub">
                                             <span class="pi-badge" style="background:{{ $kc }}22;color:{{ $kc }};">{{ $u->kategori }}</span>
                                             {{ $u->pemilik }}
+                                            @if($u->dusun) · {{ $u->dusun }}@endif
                                         </div>
                                     </div>
                                     @empty
@@ -316,7 +317,7 @@
                                     @php $ac = match($a->jenis) { 'Tanah'=>'#198754','Bangunan'=>'#0d6efd','Infrastruktur'=>'#20c997',default=>'#6c757d' }; @endphp
                                     <div class="peta-item aset-item"
                                          data-nama="{{ strtolower($a->nama) }}"
-                                         onclick="flyTo({{ $a->latitude }}, {{ $a->longitude }})">
+                                         onclick="flyToItem('aset', {{ $loop->index }})">
                                         <div class="pi-name">{{ $a->nama }}</div>
                                         <div class="pi-sub">
                                             <span class="pi-badge" style="background:{{ $ac }}22;color:{{ $ac }};">{{ $a->jenis }}</span>
@@ -346,9 +347,6 @@
                     <div id="map" style="height: 580px; width: 100%;"></div>
                     <div class="card-footer bg-white border-0 px-4 py-3">
                         <div class="row text-center">
-                            <div class="col" style="font-size:.75rem;color:#666;">
-                                <i class="fas fa-landmark me-1" style="color:var(--color-7);"></i>Fasilitas
-                            </div>
                             <div class="col" style="font-size:.75rem;color:#666;">
                                 <i class="fas fa-building me-1" style="color:#0d6efd;"></i>Aset Bangunan
                             </div>
@@ -418,7 +416,7 @@ function pin(color, faIcon, size) {
     });
 }
 
-function popup(bgColor, title, subtitle, rows, waLink) {
+function popup(bgColor, title, subtitle, rows, waLink, navLink) {
     var rowsHtml = rows.map(function(r) {
         return '<div class="popup-row"><span class="pr-label">'+r[0]+'</span><span class="pr-val">'+r[1]+'</span></div>';
     }).join('');
@@ -428,99 +426,88 @@ function popup(bgColor, title, subtitle, rows, waLink) {
         + (subtitle ? '<p class="ph-sub">'+subtitle+'</p>' : '')
         + '</div>'
         + '<div class="popup-body">'+rowsHtml
-        + (waLink ? '<a class="popup-wa" href="'+waLink+'" target="_blank"><i class="fab fa-whatsapp"></i> Hubungi WhatsApp</a>' : '')
+        + (waLink  ? '<a class="popup-wa"  href="'+waLink+'"  target="_blank"><i class="fab fa-whatsapp me-1"></i> Hubungi WhatsApp</a>' : '')
+        + (navLink ? '<a class="popup-nav" href="'+navLink+'" target="_blank"><i class="fas fa-directions me-1"></i> Navigasi Lokasi</a>' : '')
         + '</div></div>';
 }
 
 // ================================================================
 //  LAYER GROUPS
 // ================================================================
-var lgDusun    = L.layerGroup().addTo(map);
-var lgBatas    = L.layerGroup().addTo(map);
-var lgFasilitas = L.layerGroup().addTo(map);
-var lgAset     = L.layerGroup().addTo(map);
-var lgUmkm     = L.layerGroup().addTo(map);
+var lgDusun = L.layerGroup().addTo(map);
+var lgBatas = L.layerGroup().addTo(map);
+var lgAset  = L.layerGroup().addTo(map);
+var lgUmkm  = L.layerGroup().addTo(map);
 
-var layerMap = { dusun: lgDusun, batas: lgBatas, fasilitas: lgFasilitas, aset: lgAset, umkm: lgUmkm };
-var layerState = { dusun: true, batas: true, fasilitas: true, aset: true, umkm: true };
+var layerMap   = { dusun: lgDusun, batas: lgBatas, aset: lgAset, umkm: lgUmkm };
+var layerState = { dusun: true, batas: true, aset: true, umkm: true };
 
 // ================================================================
 //  BATAS DESA
 // ================================================================
-var batasDesa = L.polygon([
-    [-7.1460, 112.6720], [-7.1430, 112.6810], [-7.1420, 112.6900],
-    [-7.1440, 112.6980], [-7.1490, 112.7040], [-7.1560, 112.7060],
-    [-7.1630, 112.7050], [-7.1680, 112.7000], [-7.1700, 112.6920],
-    [-7.1690, 112.6830], [-7.1660, 112.6750], [-7.1600, 112.6690],
-    [-7.1530, 112.6680], [-7.1480, 112.6700], [-7.1460, 112.6720]
-], {
-    color: '#3A9A8C', weight: 3, opacity: 1,
-    fillColor: '#3A9A8C', fillOpacity: 0.05, dashArray: '10,5'
-}).addTo(lgBatas);
-batasDesa.bindPopup('<b>Wilayah Desa Tajungan</b><br><small>Kec. Kamal, Kab. Bangkalan</small>');
-map.fitBounds(batasDesa.getBounds(), { padding: [20, 20] });
+var batasDesaData = @json($batasDesa);
+if (batasDesaData && batasDesaData.koordinat && batasDesaData.koordinat.length >= 3) {
+    var batasDesa = L.polygon(batasDesaData.koordinat, {
+        color: batasDesaData.warna || '#3A9A8C', weight: 3, opacity: 1,
+        fillColor: batasDesaData.warna || '#3A9A8C', fillOpacity: 0.05, dashArray: '10,5'
+    }).addTo(lgBatas);
+    batasDesa.bindPopup('<b>Wilayah Desa Tajungan</b><br><small>Kec. Kamal, Kab. Bangkalan</small>');
+    map.fitBounds(batasDesa.getBounds(), { padding: [20, 20] });
+}
 
 // ================================================================
-//  BATAS DUSUN
+//  BATAS DUSUN (dari database)
 // ================================================================
-var dusunData = [
-    { nama: 'Dusun Barat',  color: '#5b9bd5', coords: [[-7.1460,112.6720],[-7.1430,112.6810],[-7.1480,112.6880],[-7.1570,112.6880],[-7.1660,112.6870],[-7.1690,112.6830],[-7.1660,112.6750],[-7.1600,112.6690],[-7.1530,112.6680],[-7.1480,112.6700],[-7.1460,112.6720]] },
-    { nama: 'Dusun Tengah', color: '#70c95e', coords: [[-7.1430,112.6810],[-7.1420,112.6900],[-7.1460,112.6990],[-7.1560,112.6990],[-7.1650,112.6980],[-7.1700,112.6920],[-7.1690,112.6830],[-7.1660,112.6870],[-7.1570,112.6880],[-7.1480,112.6880],[-7.1430,112.6810]] },
-    { nama: 'Dusun Timur',  color: '#e8a838', coords: [[-7.1420,112.6900],[-7.1440,112.6980],[-7.1490,112.7040],[-7.1560,112.7060],[-7.1630,112.7050],[-7.1680,112.7000],[-7.1700,112.6920],[-7.1650,112.6980],[-7.1560,112.6990],[-7.1460,112.6990],[-7.1420,112.6900]] }
-];
-dusunData.forEach(function(d) {
-    L.polygon(d.coords, {
-        color: d.color, weight: 2, opacity: .9,
-        fillColor: d.color, fillOpacity: .15
-    }).bindTooltip('<b>' + d.nama + '</b>', { permanent: true, direction: 'center', className: 'dusun-tooltip' })
-      .addTo(lgDusun);
-});
-
-// ================================================================
-//  FASILITAS DESA
-// ================================================================
-var fasilitasList = [
-    { nama: 'Kantor Desa Tajungan', jenis: 'Kantor Desa',  lat: -7.1544, lng: 112.6961, icon: 'fa-landmark',  color: '#1E5A52', ket: 'Pusat pemerintahan Desa Tajungan' },
-    { nama: 'Balai Desa',           jenis: 'Balai Desa',   lat: -7.1522, lng: 112.6942, icon: 'fa-home',      color: '#0d6efd', ket: 'Aula pertemuan warga kapasitas 300 orang' },
-    { nama: "Masjid Jami' Tajungan",jenis: 'Masjid',       lat: -7.1560, lng: 112.6980, icon: 'fa-mosque',    color: '#fd7e14', ket: 'Masjid utama Desa Tajungan' },
-    { nama: 'SD Negeri Tajungan',   jenis: 'Sekolah',      lat: -7.1530, lng: 112.6995, icon: 'fa-school',    color: '#6f42c1', ket: 'Sekolah Dasar Negeri Tajungan' },
-    { nama: 'Posyandu Melati',      jenis: 'Kesehatan',    lat: -7.1575, lng: 112.6945, icon: 'fa-heartbeat', color: '#dc3545', ket: 'Pos pelayanan kesehatan warga' },
-    { nama: 'Lapangan Desa',        jenis: 'Olahraga',     lat: -7.1510, lng: 112.6965, icon: 'fa-running',   color: '#20c997', ket: 'Area olahraga dan kegiatan desa' },
-];
-fasilitasList.forEach(function(f) {
-    L.marker([f.lat, f.lng], { icon: pin(f.color, f.icon, 38) })
-     .bindPopup(popup(f.color, f.nama, f.jenis, [['Jenis', f.jenis], ['Keterangan', f.ket]]), { maxWidth: 260 })
-     .addTo(lgFasilitas);
-});
+var dusunData = @json($batasDusun);
+if (dusunData.length > 0) {
+    dusunData.forEach(function(d) {
+        if (!d.koordinat || d.koordinat.length < 3) return;
+        L.polygon(d.koordinat, {
+            color: d.warna, weight: 2, opacity: .9,
+            fillColor: d.warna, fillOpacity: .15
+        }).bindTooltip('<b>' + d.nama_dusun + '</b>', { permanent: true, direction: 'center', className: 'dusun-tooltip' })
+          .addTo(lgDusun);
+    });
+}
 
 // ================================================================
 //  ASET DESA
 // ================================================================
 var asetColorMap = { 'Tanah':'#198754','Bangunan':'#0d6efd','Infrastruktur':'#20c997','Kendaraan':'#fd7e14','Peralatan & Mesin':'#6f42c1' };
 var asetIconMap  = { 'Tanah':'fa-map','Bangunan':'fa-building','Infrastruktur':'fa-road','Kendaraan':'fa-motorcycle','Peralatan & Mesin':'fa-tools' };
+var asetMarkers = [];
 asetData.forEach(function(a) {
     var c  = asetColorMap[a.jenis]  || '#6c757d';
     var ic = asetIconMap[a.jenis]   || 'fa-box';
     var rows = [['Jenis', a.jenis], ['Kondisi', a.kondisi], ['Lokasi', a.lokasi || '-']];
     if (a.luas) rows.push(['Luas', Number(a.luas).toLocaleString('id-ID') + ' m²']);
     if (a.nilai_perolehan) rows.push(['Nilai', 'Rp ' + Number(a.nilai_perolehan).toLocaleString('id-ID')]);
-    L.marker([a.latitude, a.longitude], { icon: pin(c, ic, 32) })
-     .bindPopup(popup(c, a.nama, a.jenis + ' · ' + a.kondisi, rows), { maxWidth: 260 })
-     .addTo(lgAset);
+    var navLink = 'https://www.google.com/maps?q=' + a.latitude + ',' + a.longitude;
+    asetMarkers.push(
+        L.marker([a.latitude, a.longitude], { icon: pin(c, ic, 32) })
+         .bindPopup(popup(c, a.nama, a.jenis + ' · ' + a.kondisi, rows, null, navLink), { maxWidth: 260 })
+         .addTo(lgAset)
+    );
 });
 
 // ================================================================
 //  UMKM
 // ================================================================
 var umkmColorMap = { 'Makanan':'#fd7e14','Kerajinan':'#6f42c1','Jasa':'#0d6efd','Pertanian':'#198754' };
+var umkmMarkers = [];
 umkmData.forEach(function(u) {
     var c = umkmColorMap[u.kategori] || '#6c757d';
     var rows = [['Pemilik', u.pemilik], ['Kategori', u.kategori]];
-    if (u.no_hp) rows.push(['No. WA', u.no_hp]);
-    var waLink = u.no_hp ? 'https://wa.me/' + u.no_hp + '?text=Halo,%20saya%20tertarik%20dengan%20' + encodeURIComponent(u.nama_usaha) : null;
-    L.marker([u.latitude, u.longitude], { icon: pin(c, 'fa-store', 32) })
-     .bindPopup(popup(c, u.nama_usaha, 'UMKM ' + u.kategori, rows, waLink), { maxWidth: 260 })
-     .addTo(lgUmkm);
+    if (u.dusun)  rows.push(['Dusun',  u.dusun]);
+    if (u.alamat) rows.push(['Alamat', u.alamat]);
+    if (u.no_hp)  rows.push(['No. WA', u.no_hp]);
+    var waLink  = u.no_hp ? 'https://wa.me/' + u.no_hp + '?text=Halo,%20saya%20tertarik%20dengan%20' + encodeURIComponent(u.nama_usaha) : null;
+    var navLink = 'https://www.google.com/maps?q=' + u.latitude + ',' + u.longitude;
+    umkmMarkers.push(
+        L.marker([u.latitude, u.longitude], { icon: pin(c, 'fa-store', 32) })
+         .bindPopup(popup(c, u.nama_usaha, 'UMKM ' + u.kategori, rows, waLink, navLink), { maxWidth: 260 })
+         .addTo(lgUmkm)
+    );
 });
 
 // ================================================================
@@ -540,10 +527,24 @@ function toggleLayer(key) {
 }
 
 // ================================================================
-//  FLY TO
+//  FLY TO ITEM (sidebar → marker + popup + highlight)
 // ================================================================
-function flyTo(lat, lng) {
-    map.flyTo([lat, lng], 17, { duration: 0.8 });
+function flyToItem(type, idx) {
+    var markers = type === 'umkm' ? umkmMarkers : asetMarkers;
+    var marker  = markers[idx];
+    if (!marker) return;
+    // jika layer sedang disembunyikan, tampilkan dulu
+    if (!layerState[type]) toggleLayer(type);
+    // highlight item di sidebar
+    var all = document.querySelectorAll('.' + type + '-item');
+    all.forEach(function(el) { el.classList.remove('active'); });
+    if (all[idx]) {
+        all[idx].classList.add('active');
+        all[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    // terbang ke marker lalu buka popup
+    map.flyTo(marker.getLatLng(), 18, { duration: 0.8 });
+    setTimeout(function() { marker.openPopup(); }, 900);
 }
 
 // ================================================================

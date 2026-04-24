@@ -11,7 +11,7 @@
     display: flex; align-items: center;
     background:
         linear-gradient(135deg, rgba(30,90,82,.72) 0%, rgba(58,154,140,.55) 100%),
-        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80')
+        var(--hero-bg-url, url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80'))
         center/cover no-repeat;
     color: white;
     overflow: hidden;
@@ -246,6 +246,19 @@
    HELPERS
    ============================================================ */
 .wave-sep svg { display: block; width: 100%; }
+
+/* Tooltip nama dusun di peta mini beranda */
+.dusun-tooltip-mini {
+    background: rgba(30,90,82,.85) !important;
+    border: none !important;
+    color: #fff !important;
+    font-size: .7rem !important;
+    font-weight: 700 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,.2) !important;
+}
+.dusun-tooltip-mini::before { display: none !important; }
 </style>
 @endpush
 
@@ -254,20 +267,26 @@
 {{-- ===============================================================
      HERO
      =============================================================== --}}
-<section class="hero-section">
+@php
+    $heroBg    = $kontak['hero_bg_foto'] ?? '';
+    $heroBadge = $kontak['hero_badge']   ?? 'Kec. Kamal · Kab. Bangkalan · Madura';
+    $heroJudul = $kontak['hero_judul']   ?? 'Desa Tajungan';
+    $heroDesc  = $kontak['hero_deskripsi'] ?? 'Desa Cantik (Cinta Statistik) — mewujudkan pemerintahan yang transparan, digital, dan berpihak pada warga.';
+@endphp
+<section class="hero-section" @if($heroBg) style="--hero-bg-url: url('{{ asset('storage/'.$heroBg) }}')" @endif>
     <div class="container py-5" style="position:relative;z-index:1;">
         <div class="row align-items-center">
             <div class="col-lg-7">
                 <div class="hero-badge">
                     <i class="fas fa-map-marker-alt"></i>
-                    Kec. Kamal · Kab. Bangkalan · Madura
+                    {{ $heroBadge }}
                 </div>
                 <h1 class="hero-title">
                     Selamat Datang di<br>
-                    <span style="color:var(--gold,#f9d923);">Desa Tajungan</span>
+                    <span style="color:var(--gold,#f9d923);">{{ $heroJudul }}</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Desa Cantik (Cinta Statistik) — mewujudkan pemerintahan yang transparan, digital, dan berpihak pada warga.
+                    {{ $heroDesc }}
                 </p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="{{ route('profil.desa') }}" class="hero-cta-primary">
@@ -731,22 +750,22 @@
             <p class="section-sub" style="color:rgba(255,255,255,.6);">Butuh bantuan segera? Hubungi layanan darurat berikut</p>
         </div>
         <div class="row g-3 justify-content-center">
-            @foreach([
-                ['fa-ambulance',  '#fce4e4','#dc3545', '118',           'Ambulans',            'tel:118'],
-                ['fa-shield-alt', '#cfe2ff','#0d6efd', '110',           'Polisi',              'tel:110'],
-                ['fa-fire',       '#fff3cd','#856404', '113',           'Pemadam Kebakaran',   'tel:113'],
-                ['fa-home',       '#E8F5F0','#1E5A52', '0812-3456-7890','Hotline Desa',        'tel:081234567890'],
-            ] as [$ic, $bg, $col, $num, $label, $href])
+            @forelse($kontakDarurat as $kd)
+            @php $href = 'tel:'.preg_replace('/[^0-9+]/','',$kd->nomor); @endphp
             <div class="col-6 col-md-3">
                 <a href="{{ $href }}" class="darurat-card">
-                    <div style="width:50px;height:50px;border-radius:14px;background:{{ $bg }};display:flex;align-items:center;justify-content:center;margin:0 auto;">
-                        <i class="fas {{ $ic }}" style="color:{{ $col }};font-size:1.2rem;"></i>
+                    <div style="width:50px;height:50px;border-radius:14px;background:{{ $kd->warna_bg }};display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                        <i class="fas {{ $kd->icon }}" style="color:{{ $kd->warna_teks }};font-size:1.2rem;"></i>
                     </div>
-                    <div class="darurat-num" style="color:{{ $col }};">{{ $num }}</div>
-                    <div style="font-size:.78rem;font-weight:600;color:var(--color-7);">{{ $label }}</div>
+                    <div class="darurat-num" style="color:{{ $kd->warna_teks }};">{{ $kd->nomor }}</div>
+                    <div style="font-size:.78rem;font-weight:600;color:var(--color-7);">{{ $kd->nama }}</div>
                 </a>
             </div>
-            @endforeach
+            @empty
+            <div class="col-12 text-center" style="color:rgba(255,255,255,.5);">
+                <small>Belum ada kontak darurat.</small>
+            </div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -782,25 +801,39 @@ new Chart(document.getElementById('budgetChart').getContext('2d'), {
 
 /* ===================== PETA MINI ===================== */
 var map = L.map('map-preview', { zoomControl: true, scrollWheelZoom: false }).setView([-7.1544, 112.6961], 15);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19
-}).addTo(map);
+});
+var satelitLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri World Imagery', maxZoom: 19
+});
+streetLayer.addTo(map);
+L.control.layers({ 'Peta': streetLayer, 'Satelit': satelitLayer }, {}, { position: 'topright' }).addTo(map);
 
-var batas = L.geoJSON({
-    type: 'FeatureCollection',
-    features: [{
-        type: 'Feature',
-        properties: { name: 'Wilayah Desa Tajungan' },
-        geometry: {
-            type: 'Polygon',
-            coordinates: [[[112.6720,-7.1460],[112.6810,-7.1430],[112.6900,-7.1420],[112.6980,-7.1440],[112.7040,-7.1490],[112.7060,-7.1560],[112.7050,-7.1630],[112.7000,-7.1680],[112.6920,-7.1700],[112.6830,-7.1690],[112.6750,-7.1660],[112.6690,-7.1600],[112.6680,-7.1530],[112.6700,-7.1480],[112.6720,-7.1460]]]
-        }
-    }]
-}, {
-    style: { color:'#1E5A52', weight:3, opacity:.9, fillColor:'#3A9A8C', fillOpacity:.12, dashArray:'8,4' }
-}).addTo(map);
-map.fitBounds(batas.getBounds(), { padding: [20,20] });
+// Batas Desa dari database
+var batasDesaData = @json($batasDesa);
+if (batasDesaData && batasDesaData.koordinat && batasDesaData.koordinat.length >= 3) {
+    var batasLayer = L.polygon(batasDesaData.koordinat, {
+        color: batasDesaData.warna || '#1E5A52', weight: 3, opacity: 1,
+        fillColor: batasDesaData.warna || '#3A9A8C', fillOpacity: 0.08, dashArray: '8,4'
+    }).addTo(map);
+    batasLayer.bindPopup('<b>Wilayah Desa Tajungan</b><br><small>Kec. Kamal, Kab. Bangkalan</small>');
+    map.fitBounds(batasLayer.getBounds(), { padding: [20, 20] });
+}
+
+// Batas Dusun dari database
+var batasDusunData = @json($batasDusun);
+batasDusunData.forEach(function(d) {
+    if (!d.koordinat || d.koordinat.length < 3) return;
+    L.polygon(d.koordinat, {
+        color: d.warna, weight: 2, opacity: .8,
+        fillColor: d.warna, fillOpacity: .12
+    }).bindTooltip('<b>' + d.nama_dusun + '</b>', {
+        permanent: true, direction: 'center',
+        className: 'dusun-tooltip-mini'
+    }).addTo(map);
+});
 
 function makeIcon(color, icon) {
     return L.divIcon({
@@ -810,16 +843,15 @@ function makeIcon(color, icon) {
     });
 }
 
-[
-    [-7.1544,112.6961,'Kantor Desa Tajungan','#1E5A52','fa-landmark'],
-    [-7.1520,112.6940,'Balai Desa','#0d6efd','fa-home'],
-    [-7.1560,112.6980,'Masjid Jami Tajungan','#fd7e14','fa-mosque'],
-    [-7.1530,112.6995,'SD Negeri Tajungan','#6f42c1','fa-school'],
-    [-7.1575,112.6945,'Posyandu Melati','#dc3545','fa-heartbeat'],
-].forEach(function(t) {
-    L.marker([t[0],t[1]], { icon: makeIcon(t[3],t[4]) })
+var asetColorMap = { 'Tanah':'#198754','Bangunan':'#0d6efd','Infrastruktur':'#20c997','Kendaraan':'#fd7e14','Peralatan & Mesin':'#6f42c1' };
+var asetIconMap  = { 'Tanah':'fa-map','Bangunan':'fa-building','Infrastruktur':'fa-road','Kendaraan':'fa-motorcycle','Peralatan & Mesin':'fa-tools' };
+var asetsMini = @json($asets);
+asetsMini.forEach(function(a) {
+    var c  = asetColorMap[a.jenis]  || '#6c757d';
+    var ic = asetIconMap[a.jenis]   || 'fa-box';
+    L.marker([a.latitude, a.longitude], { icon: makeIcon(c, ic) })
      .addTo(map)
-     .bindPopup('<b style="color:'+t[3]+'">'+t[2]+'</b>', { maxWidth: 180 });
+     .bindPopup('<b style="color:'+c+'">'+a.nama+'</b><br><small>'+a.jenis+' · '+a.kondisi+'</small>', { maxWidth: 180 });
 });
 map.on('click', function() { map.scrollWheelZoom.enable(); });
 </script>

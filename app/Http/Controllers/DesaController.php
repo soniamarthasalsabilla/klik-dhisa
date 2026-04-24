@@ -13,6 +13,7 @@ use App\Models\Artikel;
 use App\Models\Apbdes;
 use App\Models\Agenda;
 use App\Models\AsetDesa;
+use App\Models\BatasDusun;
 
 class DesaController extends Controller
 {
@@ -74,17 +75,24 @@ class DesaController extends Controller
 
     // --- KELOMPOK STATISTIK ---
 
-    public function statPenduduk() 
+    public function statPenduduk()
     {
-        // Contoh jika ingin mengambil data khusus kependudukan
-        $data_penduduk = Statistic::where('kategori', 'Kependudukan')->get();
-        return view('pages.statistik-penduduk', compact('data_penduduk'));
+        $umur       = Statistic::where('kategori', 'Rentang Umur')->orderBy('id')->get();
+        $pendidikan = Statistic::where('kategori', 'Pendidikan')->orderBy('id')->get();
+        $pekerjaan  = Statistic::where('kategori', 'Pekerjaan')->orderBy('id')->get();
+        $agama      = Statistic::where('kategori', 'Agama')->orderBy('id')->get();
+        $status     = Statistic::where('kategori', 'Status Perkawinan')->orderBy('id')->get();
+        $totalJiwa  = $umur->sum('jumlah');
+        return view('pages.statistik-penduduk', compact('umur', 'pendidikan', 'pekerjaan', 'agama', 'status', 'totalJiwa'));
     }
 
-    public function statKeluarga() 
+    public function statKeluarga()
     {
-        $data_keluarga = Statistic::where('kategori', 'Keluarga')->get();
-        return view('pages.statistik-keluarga', compact('data_keluarga'));
+        $kk            = Statistic::where('kategori', 'Kepala Keluarga')->orderBy('id')->get();
+        $kesejahteraan = Statistic::where('kategori', 'Kesejahteraan')->orderBy('id')->get();
+        $jaminan       = Statistic::where('kategori', 'Jaminan Kesehatan')->orderBy('id')->get();
+        $totalKK       = $kk->sum('jumlah');
+        return view('pages.statistik-keluarga', compact('kk', 'kesejahteraan', 'jaminan', 'totalKK'));
     }
 
     public function statBantuan()
@@ -106,8 +114,9 @@ class DesaController extends Controller
 
     public function profilDesa()
     {
-        $settings = DesaSetting::pluck('value', 'key')->toArray();
-        return view('pages.profil-desa', compact('settings'));
+        $settings    = DesaSetting::pluck('value', 'key')->toArray();
+        $jumlahDusun = BatasDusun::where('tipe', 'dusun')->where('is_active', true)->count();
+        return view('pages.profil-desa', compact('settings', 'jumlahDusun'));
     }
 
     public function strukturOrganisasi()
@@ -182,11 +191,13 @@ class DesaController extends Controller
             ->whereNotNull('latitude')->whereNotNull('longitude')
             ->get();
 
-        $totalUmkm  = Umkm::count();
-        $totalAset  = AsetDesa::where('is_active', true)->count();
+        $totalUmkm    = Umkm::count();
+        $totalAset    = AsetDesa::where('is_active', true)->count();
         $umkmKategori = Umkm::distinct()->pluck('kategori');
+        $batasDesa    = BatasDusun::where('tipe', 'desa')->first();
+        $batasDusun   = BatasDusun::where('tipe', 'dusun')->where('is_active', true)->orderBy('nama_dusun')->get();
 
-        return view('pages.peta-desa', compact('umkms', 'asets', 'totalUmkm', 'totalAset', 'umkmKategori'));
+        return view('pages.peta-desa', compact('umkms', 'asets', 'totalUmkm', 'totalAset', 'umkmKategori', 'batasDesa', 'batasDusun'));
     }
 
     public function asetDesa(Request $request)

@@ -70,12 +70,41 @@
     .nav-pills .nav-link { color: var(--navy) !important; border-radius: 12px !important; margin-bottom: 8px; transition: 0.3s; }
     .nav-pills .nav-link.active { background: var(--navy) !important; color: white !important; transform: scale(1.02); }
     #v-pills-tab { max-height: 500px; overflow-y: auto; }
+    .dusun-tooltip-mini { background: rgba(255,255,255,.85); border: none; box-shadow: none; font-size: .7rem; color: #333; padding: 2px 6px; }
+    .dusun-tooltip-mini::before { display: none; }
 </style>
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var map = L.map('mapUMKM').setView([-7.15539, 112.69323], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap', maxZoom: 19
+        });
+        var satelitLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri World Imagery', maxZoom: 19
+        });
+        streetLayer.addTo(map);
+        L.control.layers({ 'Peta': streetLayer, 'Satelit': satelitLayer }, {}, { position: 'topright' }).addTo(map);
+
+        /* ── Batas Desa & Dusun ── */
+        var batasDesaData = @json($batasDesa);
+        if (batasDesaData && batasDesaData.koordinat && batasDesaData.koordinat.length >= 3) {
+            var batasLayer = L.polygon(batasDesaData.koordinat, {
+                color: batasDesaData.warna || '#1E5A52', weight: 3, opacity: 0.8,
+                fillColor: batasDesaData.warna || '#3A9A8C', fillOpacity: 0.06, dashArray: '6,4'
+            }).addTo(map);
+            map.fitBounds(batasLayer.getBounds(), { padding: [30, 30] });
+        }
+        var batasDusunData = @json($batasDusun);
+        batasDusunData.forEach(function(d) {
+            if (!d.koordinat || d.koordinat.length < 3) return;
+            L.polygon(d.koordinat, {
+                color: d.warna || '#3A9A8C', weight: 1.5, opacity: 0.7,
+                fillColor: d.warna || '#3A9A8C', fillOpacity: 0.08, dashArray: '4,3'
+            }).bindTooltip('<b>' + d.nama_dusun + '</b>', {
+                permanent: true, direction: 'center', className: 'dusun-tooltip-mini'
+            }).addTo(map);
+        });
         
         var markers = {};
 
@@ -113,8 +142,18 @@
                         <div class="small mb-1">
                             <i class="fas fa-user me-2 text-secondary"></i> <b>Pemilik:</b> {{ $umkm->pemilik }}
                         </div>
+                        @if($umkm->dusun)
+                        <div class="small mb-1">
+                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i> <b>Dusun:</b> {{ $umkm->dusun }}
+                        </div>
+                        @endif
+                        @if($umkm->alamat)
+                        <div class="small mb-1">
+                            <i class="fas fa-home me-2 text-secondary"></i> <b>Alamat:</b> {{ $umkm->alamat }}
+                        </div>
+                        @endif
                         <div class="small mb-2">
-                            <i class="fas fa-phone me-2 text-success"></i> <b>WA:</b> 
+                            <i class="fas fa-phone me-2 text-success"></i> <b>WA:</b>
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $umkm->no_hp) }}" target="_blank" class="text-decoration-none">
                                 {{ $umkm->no_hp ?? '-' }}
                             </a>

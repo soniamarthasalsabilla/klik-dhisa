@@ -2,15 +2,6 @@
 
 @push('styles')
 <style>
-    .filter-pill {
-        padding: 6px 18px; border-radius: 50px;
-        border: 2px solid var(--color-3); background: white;
-        color: var(--color-6); font-size: .82rem; font-weight: 600;
-        cursor: pointer; transition: .2s; text-decoration: none; display: inline-block;
-    }
-    .filter-pill:hover { border-color: var(--color-5); color: var(--color-5); }
-    .filter-pill.active { background: var(--color-5); border-color: var(--color-5); color: white; }
-
     .summary-card {
         background: white; border-radius: 14px;
         border: 1px solid var(--color-2);
@@ -59,12 +50,18 @@
 
         {{-- Filter Tahun --}}
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-            <span class="fw-semibold" style="color:var(--color-7);font-size:.88rem;">Tahun Anggaran:</span>
+            <label for="selectTahun" class="fw-semibold mb-0" style="color:var(--color-7);font-size:.88rem;">Tahun Anggaran:</label>
             @if($tahunList->isNotEmpty())
-                @foreach($tahunList as $t)
-                <a href="{{ route('transparansi.anggaran', ['tahun'=>$t]) }}"
-                   class="filter-pill {{ $t==$tahun ? 'active' : '' }}">{{ $t }}</a>
-                @endforeach
+            <form method="GET" action="{{ route('transparansi.anggaran') }}" class="mb-0">
+                <select id="selectTahun" name="tahun" onchange="this.form.submit()"
+                        class="form-select form-select-sm"
+                        style="min-width:120px;border:2px solid var(--color-3);border-radius:50px;
+                               font-weight:600;color:var(--color-7);font-size:.84rem;cursor:pointer;">
+                    @foreach($tahunList as $t)
+                    <option value="{{ $t }}" {{ $t == $tahun ? 'selected' : '' }}>{{ $t }}</option>
+                    @endforeach
+                </select>
+            </form>
             @else
                 <span class="text-muted small">Data belum tersedia</span>
             @endif

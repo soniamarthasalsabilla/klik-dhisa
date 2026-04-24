@@ -17,6 +17,8 @@ class AsetDesa extends Model
         'is_active'       => 'boolean',
         'nilai_perolehan' => 'integer',
         'luas'            => 'float',
+        'latitude'        => 'float',
+        'longitude'       => 'float',
     ];
 
     public static array $jenisOptions = [

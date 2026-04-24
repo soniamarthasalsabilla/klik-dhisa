@@ -83,10 +83,13 @@
             </a>
 
             <div class="sidebar-label">PROFIL DESA</div>
+            <a href="{{ route('admin.tampilan_beranda') }}" class="nav-link {{ request()->routeIs('admin.tampilan_beranda') ? 'active' : '' }}">
+                <i class="fas fa-home"></i> Tampilan Beranda
+            </a>
             <a href="{{ route('admin.profil_desa') }}" class="nav-link {{ request()->routeIs('admin.profil_desa') ? 'active' : '' }}">
                 <i class="fas fa-landmark"></i> Identitas & Profil
             </a>
-            <a href="{{ route('admin.content.manage', 'kades') }}" class="nav-link">
+            <a href="{{ route('admin.profil_kades') }}" class="nav-link {{ request()->routeIs('admin.profil_kades') ? 'active' : '' }}">
                 <i class="fas fa-user-tie"></i> Profil Kades
             </a>
             <a href="{{ route('admin.pamong.index') }}" class="nav-link {{ request()->routeIs('admin.pamong*') ? 'active' : '' }}">
@@ -99,8 +102,11 @@
             </a>
 
             <div class="sidebar-label">PETA TEMATIK</div>
-            <a href="{{ route('admin.peta') }}" class="nav-link {{ request()->routeIs('admin.peta*') ? 'active' : '' }}">
+            <a href="{{ route('admin.peta') }}" class="nav-link {{ request()->routeIs('admin.peta') ? 'active' : '' }}">
                 <i class="fas fa-map-marked-alt"></i> Kelola Peta
+            </a>
+            <a href="{{ route('admin.batas_dusun.index') }}" class="nav-link {{ request()->routeIs('admin.batas_dusun*') ? 'active' : '' }}">
+                <i class="fas fa-draw-polygon"></i> Batas Dusun
             </a>
 
             <div class="sidebar-label">MEDIA</div>
@@ -122,6 +128,11 @@
             </a>
             <a href="{{ route('admin.pengaduan.index') }}" class="nav-link {{ request()->routeIs('admin.pengaduan*') ? 'active' : '' }}">
                 <i class="fas fa-comment-dots"></i> Pengaduan Warga
+            </a>
+
+            <div class="sidebar-label">PANTAU SISTEM</div>
+            <a href="{{ route('admin.log.index') }}" class="nav-link {{ request()->routeIs('admin.log*') ? 'active' : '' }}">
+                <i class="fas fa-history"></i> Log & Riwayat
             </a>
         </nav>
 

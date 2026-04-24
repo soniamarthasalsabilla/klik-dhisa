@@ -34,23 +34,72 @@ $jenisConfig = [
 </div>
 @endif
 
-{{-- Filter & Tambah --}}
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ route('admin.aset.index') }}"
-           class="btn btn-sm {{ !request('jenis') ? 'btn-desa-navy' : 'btn-outline-secondary' }} rounded-pill">
-            Semua
-        </a>
-        @foreach(App\Models\AsetDesa::$jenisOptions as $j)
-        <a href="{{ route('admin.aset.index', ['jenis' => $j]) }}"
-           class="btn btn-sm {{ request('jenis') === $j ? 'btn-desa-navy' : 'btn-outline-secondary' }} rounded-pill">
-            {{ $j }}
-        </a>
-        @endforeach
+{{-- Search & Filter Bar --}}
+<div class="card border-0 shadow-sm rounded-3 mb-3 p-3">
+    <form method="GET" action="{{ route('admin.aset.index') }}" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold mb-1" style="font-size:.8rem">Cari Aset</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted" style="font-size:.85rem"></i>
+                </span>
+                <input type="text" name="search" class="form-control border-start-0 ps-0"
+                       placeholder="Nama, lokasi, keterangan…"
+                       value="{{ request('search') }}">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold mb-1" style="font-size:.8rem">Kategori</label>
+            <select name="jenis" class="form-select">
+                <option value="">Semua Kategori</option>
+                @foreach(App\Models\AsetDesa::$jenisOptions as $j)
+                <option value="{{ $j }}" {{ request('jenis') === $j ? 'selected' : '' }}>{{ $j }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label fw-semibold mb-1" style="font-size:.8rem">Kondisi</label>
+            <select name="kondisi" class="form-select">
+                <option value="">Semua Kondisi</option>
+                @foreach(App\Models\AsetDesa::$kondisiOptions as $k)
+                <option value="{{ $k }}" {{ request('kondisi') === $k ? 'selected' : '' }}>{{ $k }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-desa-navy flex-fill">
+                <i class="fas fa-filter me-1"></i>Filter
+            </button>
+            @if(request('search') || request('jenis') || request('kondisi'))
+            <a href="{{ route('admin.aset.index') }}" class="btn btn-outline-secondary" title="Reset filter">
+                <i class="fas fa-times"></i>
+            </a>
+            @endif
+            <a href="{{ route('admin.aset.create') }}" class="btn btn-outline-success" title="Tambah Aset">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </form>
+    @if(request('search') || request('jenis') || request('kondisi'))
+    <div class="mt-2 d-flex gap-2 flex-wrap">
+        @if(request('search'))
+        <span class="badge bg-light text-dark border">
+            <i class="fas fa-search me-1 text-muted" style="font-size:.7rem"></i>{{ request('search') }}
+        </span>
+        @endif
+        @if(request('jenis'))
+        <span class="badge bg-light text-dark border">
+            <i class="fas fa-tag me-1 text-muted" style="font-size:.7rem"></i>{{ request('jenis') }}
+        </span>
+        @endif
+        @if(request('kondisi'))
+        <span class="badge bg-light text-dark border">
+            <i class="fas fa-circle me-1 text-muted" style="font-size:.7rem"></i>{{ request('kondisi') }}
+        </span>
+        @endif
+        <span class="text-muted" style="font-size:.8rem">— {{ $asets->total() }} aset ditemukan</span>
     </div>
-    <a href="{{ route('admin.aset.create') }}" class="btn btn-desa-navy">
-        <i class="fas fa-plus me-2"></i>Tambah Aset
-    </a>
+    @endif
 </div>
 
 <div class="card border-0 shadow-sm rounded-3">

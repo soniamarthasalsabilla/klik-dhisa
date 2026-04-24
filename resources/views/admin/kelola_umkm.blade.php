@@ -4,11 +4,72 @@
 
 @section('content')
 
+@if(session('success'))
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+@endif
+@if(session('warning'))
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>{{ session('warning') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+@endif
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <p class="text-muted mb-0">Tambah, edit, atau hapus data UMKM yang ditampilkan di peta desa.</p>
-    <a href="{{ route('admin.create') }}" class="btn btn-desa-navy">
-        <i class="fas fa-plus me-2"></i>Tambah UMKM
-    </a>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalImportCsv">
+            <i class="fas fa-file-csv me-2"></i>Import CSV
+        </button>
+        <a href="{{ route('admin.create') }}" class="btn btn-desa-navy">
+            <i class="fas fa-plus me-2"></i>Tambah UMKM
+        </a>
+    </div>
+</div>
+
+{{-- Modal Import CSV --}}
+<div class="modal fade" id="modalImportCsv" tabindex="-1" aria-labelledby="modalImportCsvLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalImportCsvLabel">
+                    <i class="fas fa-file-csv text-success me-2"></i>Import Data UMKM dari CSV
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="alert alert-info d-flex align-items-start gap-2 py-2 mb-3">
+                    <i class="fas fa-info-circle mt-1 flex-shrink-0"></i>
+                    <div class="small">
+                        File CSV harus memiliki kolom: <strong>nama_usaha, pemilik, kategori, no_hp, alamat, dusun, latitude, longitude</strong>.
+                        Kolom <em>no_hp, alamat, dusun, latitude, longitude</em> boleh dikosongkan.
+                        <a href="{{ route('admin.umkm.template') }}" class="d-block mt-1 fw-semibold">
+                            <i class="fas fa-download me-1"></i>Download template CSV
+                        </a>
+                    </div>
+                </div>
+                <form action="{{ route('admin.umkm.import') }}" method="POST" enctype="multipart/form-data" id="formImportCsv">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="file_csv" class="form-label fw-semibold">Pilih File CSV</label>
+                        <input type="file" class="form-control @error('file_csv') is-invalid @enderror"
+                               id="file_csv" name="file_csv" accept=".csv">
+                        @error('file_csv')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success" id="btnImport">
+                            <i class="fas fa-upload me-2"></i>Import
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="card border-0 shadow-sm rounded-3">
@@ -80,5 +141,15 @@
     </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('formImportCsv')?.addEventListener('submit', function() {
+    const btn = document.getElementById('btnImport');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengimport...';
+});
+</script>
+@endpush
 
 @endsection

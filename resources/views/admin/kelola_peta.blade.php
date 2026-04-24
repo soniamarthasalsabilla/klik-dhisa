@@ -41,6 +41,8 @@
 
     .nav-tabs .nav-link { font-size: .82rem; font-weight: 600; color: var(--color-6); }
     .nav-tabs .nav-link.active { color: var(--color-7); border-bottom: 2px solid var(--color-5); }
+    .dusun-label-admin { background: rgba(255,255,255,.85); border: none; box-shadow: none; font-size: .68rem; color: #333; padding: 2px 6px; }
+    .dusun-label-admin::before { display: none; }
 </style>
 @endpush
 
@@ -198,14 +200,34 @@ var CSRF = '{{ csrf_token() }}';
 /* ========== MAP INIT ========== */
 var map = L.map('map-admin', { zoomControl: true }).setView([-7.1544, 112.6961], 15);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap', maxZoom: 19
-}).addTo(map);
+});
+var satelitLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri World Imagery', maxZoom: 19
+});
+streetLayer.addTo(map);
+L.control.layers({ 'Peta': streetLayer, 'Satelit': satelitLayer }, {}, { position: 'topright' }).addTo(map);
 
-/* Batas wilayah */
-L.geoJSON({type:'FeatureCollection',features:[{type:'Feature',geometry:{type:'Polygon',coordinates:[[[112.6720,-7.1460],[112.6810,-7.1430],[112.6900,-7.1420],[112.6980,-7.1440],[112.7040,-7.1490],[112.7060,-7.1560],[112.7050,-7.1630],[112.7000,-7.1680],[112.6920,-7.1700],[112.6830,-7.1690],[112.6750,-7.1660],[112.6690,-7.1600],[112.6680,-7.1530],[112.6700,-7.1480],[112.6720,-7.1460]]]}},{properties:{}}]},{
-    style:{color:'#1E5A52',weight:2,opacity:.7,fillColor:'#3A9A8C',fillOpacity:.08,dashArray:'6,4'}
-}).addTo(map);
+/* ── Batas Desa & Dusun dari database ── */
+var batasDesaData = @json($batasDesa);
+if (batasDesaData && batasDesaData.koordinat && batasDesaData.koordinat.length >= 3) {
+    var batasLayer = L.polygon(batasDesaData.koordinat, {
+        color: batasDesaData.warna || '#1E5A52', weight: 2.5, opacity: 0.8,
+        fillColor: batasDesaData.warna || '#3A9A8C', fillOpacity: 0.07, dashArray: '6,4'
+    }).addTo(map);
+    map.fitBounds(batasLayer.getBounds(), { padding: [20, 20] });
+}
+var batasDusunData = @json($batasDusun);
+batasDusunData.forEach(function(d) {
+    if (!d.koordinat || d.koordinat.length < 3) return;
+    L.polygon(d.koordinat, {
+        color: d.warna || '#3A9A8C', weight: 1.5, opacity: 0.7,
+        fillColor: d.warna || '#3A9A8C', fillOpacity: 0.08, dashArray: '4,3'
+    }).bindTooltip('<b>' + d.nama_dusun + '</b>', {
+        permanent: true, direction: 'center', className: 'dusun-label-admin'
+    }).addTo(map);
+});
 
 /* ========== DATA FROM SERVER ========== */
 var umkms = @json($umkms);
@@ -229,16 +251,20 @@ function editUrl(type, id) {
 }
 
 function addMarker(item, type) {
-    if (!item.latitude || !item.longitude) return;
+    var lat = parseFloat(item.latitude);
+    var lng = parseFloat(item.longitude);
+    if (!lat || !lng) return;
     var color = type === 'umkm' ? '#1E5A52' : '#0d6efd';
     var nama  = type === 'umkm' ? item.nama_usaha : item.nama;
-    var m = L.marker([item.latitude, item.longitude], { icon: makeIcon(color, false) })
+    var m = L.marker([lat, lng], { icon: makeIcon(color, false) })
         .addTo(map)
         .bindPopup(
             '<div style="min-width:160px;">' +
             '<p class="fw-bold mb-1" style="color:'+color+';font-size:.85rem;">'+nama+'</p>' +
-            '<small class="text-muted d-block mb-2">'+(type==='umkm'?item.kategori:item.jenis)+'</small>' +
-            '<small class="text-muted d-block mb-2"><i class="fas fa-map-marker-alt me-1"></i>'+item.latitude.toFixed(5)+', '+item.longitude.toFixed(5)+'</small>' +
+            '<small class="text-muted d-block mb-1">'+(type==='umkm'?item.kategori:item.jenis)+'</small>' +
+            (type==='umkm' && item.dusun  ? '<small class="text-muted d-block mb-1"><i class="fas fa-map-marker-alt me-1"></i>'+item.dusun+'</small>' : '') +
+            (type==='umkm' && item.alamat ? '<small class="text-muted d-block mb-1"><i class="fas fa-home me-1"></i>'+item.alamat+'</small>' : '') +
+            '<small class="text-muted d-block mb-2"><i class="fas fa-crosshairs me-1"></i>'+lat.toFixed(5)+', '+lng.toFixed(5)+'</small>' +
             '<a href="'+editUrl(type,item.id)+'" class="btn btn-sm btn-outline-primary rounded-pill w-100" style="font-size:.75rem;">Edit Detail</a>' +
             '</div>'
         );
@@ -265,8 +291,8 @@ function selectItem(el) {
 
     var id   = el.dataset.id;
     var type = el.dataset.type;
-    var lat  = parseFloat(el.dataset.lat);
-    var lng  = parseFloat(el.dataset.lng);
+    var lat  = parseFloat(el.dataset.lat) || null;
+    var lng  = parseFloat(el.dataset.lng) || null;
     var name = el.dataset.name;
 
     el.classList.add('selected');
@@ -276,7 +302,7 @@ function selectItem(el) {
     var key = type + '_' + id;
     if (markers[key]) {
         markers[key].marker.setIcon(makeIcon('#ffc107', true));
-        map.flyTo([lat, lng], 17, { duration: 0.8 });
+        if (lat && lng) map.flyTo([lat, lng], 17, { duration: 0.8 });
         markers[key].marker.openPopup();
     } else if (lat && lng) {
         map.flyTo([lat, lng], 17, { duration: 0.8 });

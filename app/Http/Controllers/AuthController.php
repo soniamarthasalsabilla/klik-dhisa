@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,6 +22,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            ActivityLog::record('login', 'Admin login ke sistem');
             return redirect()->intended('/admin');
         }
 
@@ -31,6 +33,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        ActivityLog::record('logout', 'Admin logout dari sistem');
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

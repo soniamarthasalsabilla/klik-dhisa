@@ -11,9 +11,21 @@ class AsetDesaController extends Controller
     public function index(Request $request)
     {
         $query = AsetDesa::orderBy('jenis')->orderBy('nama');
+
         if ($request->filled('jenis')) {
             $query->where('jenis', $request->jenis);
         }
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                  ->orWhere('lokasi', 'like', '%' . $request->search . '%')
+                  ->orWhere('keterangan', 'like', '%' . $request->search . '%');
+            });
+        }
+
         $asets = $query->paginate(20)->withQueryString();
 
         $totals = AsetDesa::selectRaw('jenis, count(*) as jumlah')
