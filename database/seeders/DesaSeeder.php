@@ -70,36 +70,41 @@ class DesaSeeder extends Seeder
         Statistic::create(['label' => 'BPJS Kesehatan', 'jumlah' => 300, 'kategori' => 'Jaminan Kesehatan']);
         Statistic::create(['label' => 'Tidak Ada', 'jumlah' => 100, 'kategori' => 'Jaminan Kesehatan']);
 
-        // PKH — per komponen
+        // Fasilitas Umum — Tempat Ibadah
         foreach ([
-            ['Ibu Hamil / Nifas',                              12],
-            ['Anak Usia Dini (0-6 tahun)',                     35],
-            ['Anak SD / Sederajat',                            45],
-            ['Anak SMP / Sederajat',                           28],
-            ['Anak SMA / Sederajat',                           15],
-            ['Lansia (70+ tahun)',                             10],
-            ['Disabilitas Berat',                               5],
+            ['Masjid',   2],
+            ['Musholla', 6],
+            ['Langgar',  4],
         ] as [$label, $jumlah]) {
-            Statistic::create(['kategori' => 'PKH', 'label' => $label, 'jumlah' => $jumlah]);
+            Statistic::create(['kategori' => 'Tempat Ibadah', 'label' => $label, 'jumlah' => $jumlah]);
         }
 
-        // BPNT — per status
+        // Fasilitas Umum — Pendidikan
         foreach ([
-            ['Aktif Menerima',    242],
-            ['Dalam Verifikasi',   18],
-            ['Diusulkan Hapus',    10],
+            ['PAUD / TK',              2],
+            ['SD / MI',                2],
+            ['SMP / MTs',              1],
+            ['TPQ / Madrasah Diniyah', 3],
         ] as [$label, $jumlah]) {
-            Statistic::create(['kategori' => 'BPNT', 'label' => $label, 'jumlah' => $jumlah]);
+            Statistic::create(['kategori' => 'Fasilitas Pendidikan', 'label' => $label, 'jumlah' => $jumlah]);
         }
 
-        // BLT Dana Desa — per kategori penerima
+        // Fasilitas Umum — Kesehatan
         foreach ([
-            ['Miskin Ekstrem (belum terdata bantuan lain)',    30],
-            ['Anggota Keluarga Sakit / Disabilitas',          15],
-            ['Lansia Tunggal Tanpa Penanggung',               10],
-            ['Kehilangan Mata Pencaharian',                    5],
+            ['Posyandu',           3],
+            ['Polindes / Poskesdes', 1],
+            ['Apotek / Toko Obat', 2],
         ] as [$label, $jumlah]) {
-            Statistic::create(['kategori' => 'BLT Dana Desa', 'label' => $label, 'jumlah' => $jumlah]);
+            Statistic::create(['kategori' => 'Fasilitas Kesehatan', 'label' => $label, 'jumlah' => $jumlah]);
+        }
+
+        // Fasilitas Umum — Sarana Olahraga
+        foreach ([
+            ['Lapangan Sepak Bola',    1],
+            ['Lapangan Voli',          2],
+            ['Lapangan Bulu Tangkis',  1],
+        ] as [$label, $jumlah]) {
+            Statistic::create(['kategori' => 'Sarana Olahraga', 'label' => $label, 'jumlah' => $jumlah]);
         }
 
         // Data Kepala Desa

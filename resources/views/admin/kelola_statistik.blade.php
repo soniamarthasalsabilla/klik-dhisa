@@ -35,11 +35,12 @@
                 </button>
                 @endforeach
 
-                <p class="sidebar-label mb-2 mt-3">Statistik Bantuan</p>
+                <p class="sidebar-label mb-2 mt-3">Statistik Fasilitas Umum</p>
                 @foreach([
-                    ['cat' => 'PKH',           'icon' => 'fa-hand-holding-heart'],
-                    ['cat' => 'BPNT',          'icon' => 'fa-shopping-basket'],
-                    ['cat' => 'BLT Dana Desa', 'icon' => 'fa-money-bill-wave'],
+                    ['cat' => 'Tempat Ibadah',       'icon' => 'fa-mosque'],
+                    ['cat' => 'Fasilitas Pendidikan', 'icon' => 'fa-school'],
+                    ['cat' => 'Fasilitas Kesehatan',  'icon' => 'fa-clinic-medical'],
+                    ['cat' => 'Sarana Olahraga',      'icon' => 'fa-running'],
                 ] as $item)
                 <button class="tab-btn btn btn-sm w-100 text-start mb-1 rounded-2" data-category="{{ $item['cat'] }}">
                     <i class="fas {{ $item['icon'] }} me-2"></i>{{ $item['cat'] }}
@@ -61,6 +62,7 @@
                     <i class="fas fa-mouse-pointer fa-3x text-muted opacity-25 mb-3"></i>
                     <p class="text-muted">Pilih kategori di sebelah kiri untuk mulai mengelola data statistik.</p>
                 </div>
+
 
                 {{-- Form --}}
                 <form id="statistic-form" action="{{ route('admin.statistik.updateMultiple') }}" method="POST" style="display:none;">
@@ -129,12 +131,10 @@ document.addEventListener('DOMContentLoaded', function () {
             formTitle.textContent = 'Kelola Data: ' + cat;
             emptyState.style.display = 'none';
 
-            // Hapus hidden input kategori lama
             form.querySelectorAll('input[name="kategori"]').forEach(el => el.remove());
-
             formFields.innerHTML = '';
-            const filtered = allStats.filter(s => s.kategori === cat);
 
+            const filtered = allStats.filter(s => s.kategori === cat);
             if (filtered.length === 0) {
                 formFields.innerHTML = '<p class="text-muted text-center py-4">Belum ada data untuk kategori ini.</p>';
             } else {

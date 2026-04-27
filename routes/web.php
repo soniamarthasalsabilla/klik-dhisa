@@ -137,7 +137,7 @@ Route::get('/layanan-desa', [DesaController::class, 'layanan'])->name('layanan.d
 
 Route::get('/statistik-penduduk', [DesaController::class, 'statPenduduk'])->name('stat.penduduk');
 Route::get('/statistik-keluarga', [DesaController::class, 'statKeluarga'])->name('stat.keluarga');
-Route::get('/statistik-bantuan', [DesaController::class, 'statBantuan'])->name('stat.bantuan');
+Route::get('/statistik-fasilitas-umum', [DesaController::class, 'statFasilitasUmum'])->name('stat.fasilitas');
 
 // UMKM Peta (Halaman Publik)
 Route::get('/umkm-desa', [AdminController::class, 'index'])->name('umkm.desa');

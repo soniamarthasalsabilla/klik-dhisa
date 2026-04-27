@@ -71,7 +71,7 @@
                 <i class="fas fa-info-circle"></i> Informasi Publik
             </a>
             <a href="{{ route('admin.content.manage', 'arsip') }}" class="nav-link">
-                <i class="fas fa-archive"></i> Arsip Dokumen
+                <i class="fas fa-archive"></i> Publikasi Desa
             </a>
             <a href="{{ route('admin.content.manage', 'layanan') }}" class="nav-link">
                 <i class="fas fa-concierge-bell"></i> Layanan Desa

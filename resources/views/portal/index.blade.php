@@ -39,10 +39,13 @@
 
         /* Top bar */
         .hero-topbar {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 24px 40px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 20px 40px;
             position: relative; z-index: 2;
         }
+        .hero-topbar-right { justify-self: end; }
         .hero-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .hero-brand-icon {
             width: 44px; height: 44px; border-radius: 10px;
@@ -53,7 +56,7 @@
         .hero-brand-text strong { display: block; color: white; font-size: 1rem; font-weight: 800; line-height: 1.2; letter-spacing: .3px; }
         .hero-brand-text strong em { color: var(--gold); font-style: normal; }
         .hero-brand-text small  { display: block; color: rgba(255,255,255,.6); font-size: .66rem; }
-        .hero-topbar-right { color: rgba(255,255,255,.6); font-size: .75rem; }
+        .hero-topbar-right { color: rgba(255,255,255,.6); font-size: .75rem; text-align: right; }
 
         /* Center content */
         .hero-center {
@@ -304,6 +307,42 @@
             text-align: center; padding: 22px 20px; font-size: .75rem;
         }
         .portal-footer strong { color: rgba(255,255,255,.85); }
+
+        /* ══════════════════════════════
+           LOGO STRIP
+        ══════════════════════════════ */
+        .logo-strip {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 0;
+            background: rgba(255,255,255,.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.28);
+            border-radius: 10px;
+            padding: 6px 12px;
+        }
+        .logo-item {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0 10px;
+        }
+        .logo-item img {
+            height: 24px; width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,.2));
+        }
+        .logo-item .logo-fb {
+            display: none; width: 24px; height: 24px;
+            align-items: center; justify-content: center;
+        }
+        .logo-item .logo-label {
+            font-size: .5rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .3px; color: rgba(255,255,255,.7);
+            text-align: center; margin-top: 3px; line-height: 1.3;
+        }
+        .logo-sep {
+            width: 1px; height: 22px;
+            background: rgba(255,255,255,.3);
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -317,6 +356,31 @@
                 <small>Kab. {{ $kabupaten }} &mdash; Kanal Layanan Informasi &amp; Statistik</small>
             </div>
         </a>
+
+        {{-- Logo Strip: Pemda · BPS · Desa Cantik --}}
+        <div class="logo-strip">
+            <div class="logo-item">
+                <img src="/img/logo pemda.png" alt="Logo Pemda Bangkalan"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="logo-fb"><i class="fas fa-landmark" style="font-size:1.4rem;color:rgba(255,255,255,.85);"></i></div>
+                <div class="logo-label">Pemda<br>Bangkalan</div>
+            </div>
+            <div class="logo-sep"></div>
+            <div class="logo-item">
+                <img src="/img/logo bps.png" alt="Logo BPS"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="logo-fb"><i class="fas fa-chart-bar" style="font-size:1.4rem;color:rgba(255,255,255,.85);"></i></div>
+                <div class="logo-label">Badan Pusat<br>Statistik</div>
+            </div>
+            <div class="logo-sep"></div>
+            <div class="logo-item">
+                <img src="/img/desa cantik.png" alt="Desa Cantik"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="logo-fb"><i class="fas fa-star" style="font-size:1.4rem;color:rgba(255,255,255,.85);"></i></div>
+                <div class="logo-label">Desa<br>Cantik</div>
+            </div>
+        </div>
+
         <div class="hero-topbar-right d-none d-md-block">
             <i class="fas fa-map-marker-alt me-1"></i>Kabupaten {{ $kabupaten }}, {{ $provinsi }}
         </div>

@@ -258,7 +258,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Ikon <span class="text-danger">*</span></label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-semibold mb-0">Ikon <span class="text-danger">*</span></label>
+                            <a href="https://fontawesome.com/icons?d=gallery&s=solid&m=free" target="_blank"
+                               class="text-decoration-none" style="font-size:.75rem;color:var(--color-5);">
+                                <i class="fas fa-external-link-alt me-1"></i>Lihat semua ikon tersedia
+                            </a>
+                        </div>
                         <div class="input-group">
                             <span class="input-group-text" style="min-width:40px;justify-content:center;">
                                 <i class="fas fa-phone-alt" id="kIconPreview"></i>
@@ -266,7 +272,7 @@
                             <input type="text" name="icon" id="kIcon" class="form-control"
                                    placeholder="fa-ambulance" required oninput="kUpdateIcon(this.value)">
                         </div>
-                        <small class="text-muted">Contoh: fa-ambulance, fa-fire, fa-shield-alt, fa-hospital</small>
+                        <small class="text-muted">Contoh: <code>fa-ambulance</code>, <code>fa-fire</code>, <code>fa-shield-alt</code>, <code>fa-hospital</code> — salin nama kelas dari situs FontAwesome lalu tempel di sini.</small>
                     </div>
 
                     <div class="row g-3 mb-3">

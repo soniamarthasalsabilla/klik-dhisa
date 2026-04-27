@@ -1,3 +1,7 @@
+@php
+    $footerLogo     = \App\Models\DesaSetting::get('logo_desa');
+    $footerNamaDesa = \App\Models\DesaSetting::get('nama_navbar');
+@endphp
 <footer style="background-color: var(--color-7); color: white; padding: 30px 0 15px; position: relative; margin-top: -2px;">
     <div class="wave-container wave-top" style="position: absolute; top: 0; left: 0; transform: translateY(-98%); width: 100%;">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none" style="height: 50px; width: 100%;">
@@ -8,8 +12,26 @@
 
     <div class="container text-start position-relative z-2">
         <div class="row g-4"> <div class="col-lg-4">
-                <a class="navbar-brand fw-bold d-flex align-items-center gap-2 fs-4 mb-2" href="/"> <i class="fas fa-landmark text-warning"></i> 
-                    <span class="serif-title" style="color: white !important;">Dhisâ</span>
+                <a class="navbar-brand fw-bold d-flex align-items-center flex-wrap gap-2 mb-2" href="/">
+                    {{-- 3 Logo statis --}}
+                    <img src="{{ asset('img/logo pemda.png') }}" alt="Pemda Bangkalan"
+                         style="height:28px;width:auto;object-fit:contain;opacity:.85;">
+                    <img src="{{ asset('img/logo bps.png') }}" alt="BPS"
+                         style="height:28px;width:auto;object-fit:contain;opacity:.85;">
+                    <img src="{{ asset('img/desa cantik.png') }}" alt="Desa Cantik"
+                         style="height:28px;width:auto;object-fit:contain;opacity:.85;">
+                    <span style="width:1px;height:28px;background:rgba(255,255,255,.3);flex-shrink:0;"></span>
+                    {{-- Logo desa dari DB --}}
+                    @if($footerLogo)
+                        <img src="{{ asset('storage/'.$footerLogo) }}" alt="Logo Desa"
+                             style="height:32px;width:auto;object-fit:contain;">
+                    @else
+                        <i class="fas fa-landmark text-warning" style="font-size:1.4rem;"></i>
+                    @endif
+                    <span class="serif-title" style="color:white;font-size:1.1rem;font-weight:700;">Dhis&#xE2;</span>
+                    @if($footerNamaDesa)
+                        <span class="serif-title" style="color:rgba(255,255,255,.85);font-size:1.1rem;font-weight:700;">{{ $footerNamaDesa }}</span>
+                    @endif
                 </a>
                 <p class="opacity-75 small mb-2">Mewujudkan tata kelola desa bersih, transparan, dan berbasis statistik untuk warga Bangkalan.</p> <p class="small op-7 fw-bold mb-0" style="color: var(--gold); font-size: 0.8rem;">Pemerintah Kabupaten Bangkalan</p>
             </div>

@@ -401,8 +401,8 @@ class AdminController extends Controller
             $query->where('kategori', request('kategori'));
         }
 
-        $statistics = $query->orderBy('kategori')->paginate(10);
-        $allStatistics = Statistic::all(); // For summary
+        $statistics    = $query->orderBy('kategori')->paginate(10);
+        $allStatistics = Statistic::all();
         return view('admin.kelola_statistik', compact('statistics', 'allStatistics'));
     }
 

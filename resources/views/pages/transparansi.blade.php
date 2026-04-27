@@ -18,16 +18,22 @@
         font-size: .75rem; font-weight: 700; text-transform: uppercase;
         letter-spacing: .4px; padding: 10px 14px; border-bottom: 2px solid var(--color-2);
     }
-    .apb-table tbody td { font-size: .84rem; padding: 10px 14px; vertical-align: middle; }
+    .apb-table tbody td { font-size: .85rem; padding: 10px 14px; vertical-align: middle; }
     .apb-table tbody tr:hover { background: var(--color-1); }
     .apb-table tfoot td {
-        font-weight: 700; font-size: .84rem;
+        font-weight: 700; font-size: .85rem;
         background: var(--color-1); border-top: 2px solid var(--color-2);
         padding: 10px 14px;
     }
-
-    .jenis-pendapatan { border-left: 3px solid #0d6efd; }
-    .jenis-belanja    { border-left: 3px solid var(--color-5); }
+    .apb-section-header td {
+        background: var(--color-6) !important;
+        color: white !important;
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 6px 14px !important;
+    }
 
     .progress-bar-teal { background: var(--color-5); }
 </style>
@@ -39,9 +45,9 @@
 <section class="py-3" style="background: white; border-bottom: 3px solid var(--color-5);">
     <div class="container text-center py-4">
         <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">
-            <i class="fas fa-chart-pie me-2" style="color:var(--color-5);"></i>Transparansi Anggaran
+            <i class="fas fa-chart-pie me-2" style="color:var(--color-5);"></i>Anggaran Desa (APBDes)
         </h2>
-        <p class="mb-0" style="color: var(--color-6); font-size: 1rem;">Laporan Anggaran Pendapatan dan Belanja Desa (APBDes)</p>
+        <p class="mb-0" style="color: var(--color-6); font-size: 1rem;">Anggaran Pendapatan dan Belanja Desa Tajungan</p>
     </div>
 </section>
 
@@ -67,10 +73,11 @@
             @endif
         </div>
 
-        @if($items->isEmpty())
+        @if(!$tahun || $pendapatan->isEmpty() && $belanja->isEmpty())
         <div class="text-center py-5" style="color:#adb5bd;">
             <i class="fas fa-file-invoice-dollar fa-4x mb-3 opacity-25 d-block"></i>
-            <p class="mb-0 fw-semibold">Data APBDes tahun {{ $tahun }} belum tersedia.</p>
+            <p class="mb-0 fw-semibold">Data APBDes belum tersedia.</p>
+            <p class="small mt-1">Data anggaran hanya ditampilkan untuk tahun yang telah selesai.</p>
         </div>
         @else
 
@@ -83,7 +90,7 @@
                     <div class="progress mt-2" style="height:6px;border-radius:10px;">
                         <div class="progress-bar" style="width:100%;background:#0d6efd;border-radius:10px;"></div>
                     </div>
-                    <div class="pct mt-1">Target Pendapatan {{ $tahun }}</div>
+                    <div class="pct mt-1">Realisasi Pendapatan {{ $tahun }}</div>
                 </div>
             </div>
             <div class="col-md-4">
@@ -127,60 +134,57 @@
             </div>
             @endif
 
-            {{-- Tabel Rincian --}}
+            {{-- Tabel Ringkasan --}}
             <div class="col-lg-{{ $belanja->isNotEmpty() ? '7' : '12' }}">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-header bg-white border-0 pt-3 pb-0 px-4">
                         <h6 class="fw-bold mb-0" style="color:var(--color-7);">
-                            <i class="fas fa-table me-2" style="color:var(--color-5);"></i>Rincian Anggaran {{ $tahun }}
+                            <i class="fas fa-table me-2" style="color:var(--color-5);"></i>Ringkasan APBDes {{ $tahun }}
                         </h6>
                     </div>
                     <div class="table-responsive mt-2">
                         <table class="table apb-table mb-0">
                             <thead>
                                 <tr>
-                                    <th>Bidang / Kegiatan</th>
-                                    <th>Jenis</th>
+                                    <th>Uraian</th>
                                     <th class="text-end">Anggaran (Rp)</th>
-                                    <th class="text-end">Realisasi (Rp)</th>
-                                    <th class="text-center">%</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($items->sortBy('jenis') as $item)
-                                <tr class="{{ $item->jenis==='pendapatan' ? 'jenis-pendapatan' : 'jenis-belanja' }}">
-                                    <td>
-                                        <div class="fw-semibold" style="color:var(--color-7);">{{ $item->bidang }}</div>
-                                        @if($item->kegiatan)<small class="text-muted">{{ $item->kegiatan }}</small>@endif
-                                    </td>
-                                    <td>
-                                        <span class="badge rounded-pill"
-                                              style="background:{{ $item->jenis==='pendapatan' ? '#cfe2ff' : '#E8F5F0' }};
-                                                     color:{{ $item->jenis==='pendapatan' ? '#0d6efd' : 'var(--color-7)' }};
-                                                     font-size:.65rem;">
-                                            {{ ucfirst($item->jenis) }}
-                                        </span>
-                                    </td>
+                                {{-- Pendapatan --}}
+                                <tr class="apb-section-header">
+                                    <td colspan="2">Pendapatan</td>
+                                </tr>
+                                @foreach($pendapatan as $i => $item)
+                                <tr>
+                                    <td class="px-4" style="color:var(--color-7);">{{ $item->bidang }}</td>
                                     <td class="text-end">{{ number_format($item->anggaran, 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ number_format($item->realisasi, 0, ',', '.') }}</td>
-                                    <td class="text-center">
-                                        @php $pct = $item->persentase; @endphp
-                                        <span class="badge rounded-pill"
-                                              style="background:{{ $pct>=75?'#d1e7dd':($pct>=50?'#fff3cd':'#f8d7da') }};
-                                                     color:{{ $pct>=75?'#146c43':($pct>=50?'#664d03':'#842029') }};
-                                                     font-size:.7rem;">
-                                            {{ $pct }}%
-                                        </span>
-                                    </td>
                                 </tr>
                                 @endforeach
+                                <tr>
+                                    <td class="px-4 fw-bold" style="color:#0d6efd;">Total Pendapatan</td>
+                                    <td class="text-end fw-bold" style="color:#0d6efd;">{{ number_format($totalPendapatan, 0, ',', '.') }}</td>
+                                </tr>
+
+                                {{-- Belanja --}}
+                                <tr class="apb-section-header">
+                                    <td colspan="2">Belanja</td>
+                                </tr>
+                                @foreach($belanjaByBidang as $bidang => $row)
+                                <tr>
+                                    <td class="px-4" style="color:var(--color-7);">{{ $bidang }}</td>
+                                    <td class="text-end">{{ number_format($row['anggaran'], 0, ',', '.') }}</td>
+                                </tr>
+                                @endforeach
+                                <tr>
+                                    <td class="px-4 fw-bold" style="color:var(--color-5);">Total Belanja</td>
+                                    <td class="text-end fw-bold" style="color:var(--color-5);">{{ number_format($totalAnggaran, 0, ',', '.') }}</td>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="2" style="color:var(--color-7);">Total Anggaran</td>
-                                    <td class="text-end" style="color:var(--color-7);">{{ number_format($totalAnggaran + $totalPendapatan, 0, ',', '.') }}</td>
-                                    <td class="text-end" style="color:var(--color-5);">{{ number_format($totalRealisasi, 0, ',', '.') }}</td>
-                                    <td class="text-center" style="color:var(--color-5);">{{ $pctRealisasi }}%</td>
+                                    <td style="color:var(--color-7);">SiLPA (Sisa Lebih Perhitungan Anggaran)</td>
+                                    <td class="text-end" style="color:var(--color-7);">{{ number_format($siLPApos, 0, ',', '.') }}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -193,8 +197,7 @@
         <div class="p-3 rounded-3 d-flex align-items-start gap-3" style="background:var(--color-1);border:1px solid var(--color-2);">
             <i class="fas fa-info-circle mt-1" style="color:var(--color-5);"></i>
             <small style="color:var(--color-6);line-height:1.6;">
-                Data diperbarui secara berkala sesuai laporan realisasi Bendahara Desa Tajungan. Tahun Anggaran {{ $tahun }}.
-                Untuk pertanyaan, hubungi Kaur Keuangan Desa Tajungan.
+                Data APBDes Tahun {{ $tahun }} telah selesai direalisasikan. Untuk rincian lebih lanjut, dapat menghubungi Kaur Keuangan Desa Tajungan.
             </small>
         </div>
 
@@ -226,8 +229,7 @@ new Chart(document.getElementById('apbdesChart').getContext('2d'), {
             tooltip: {
                 callbacks: {
                     label: function(ctx) {
-                        var val = ctx.raw;
-                        return ' Rp ' + val.toLocaleString('id-ID');
+                        return ' Rp ' + ctx.raw.toLocaleString('id-ID');
                     }
                 }
             }

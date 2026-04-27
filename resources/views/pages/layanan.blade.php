@@ -116,10 +116,10 @@
 
         @php
         $katConfig = [
-            'Administrasi'  => ['icon' => 'fa-id-card',          'color' => '#0d6efd', 'bg' => '#e8f0fe'],
-            'Keterangan'    => ['icon' => 'fa-file-alt',          'color' => '#198754', 'bg' => '#e8f5e9'],
-            'Perizinan'     => ['icon' => 'fa-stamp',             'color' => '#fd7e14', 'bg' => '#fff3e0'],
-            'Bantuan Sosial'=> ['icon' => 'fa-hand-holding-heart','color' => '#dc3545', 'bg' => '#fce4e4'],
+            'Administrasi'       => ['icon' => 'fa-id-card',          'color' => '#0d6efd', 'bg' => '#e8f0fe'],
+            'Keterangan'         => ['icon' => 'fa-file-alt',          'color' => '#198754', 'bg' => '#e8f5e9'],
+            'Perizinan'          => ['icon' => 'fa-stamp',             'color' => '#fd7e14', 'bg' => '#fff3e0'],
+            'Pemutakhiran DTSEN' => ['icon' => 'fa-database',          'color' => '#6f42c1', 'bg' => '#f0ebff'],
         ];
         @endphp
 
@@ -206,10 +206,10 @@
      ============================================================ --}}
 @php
 $katConfig2 = [
-    'Administrasi'  => ['icon' => 'fa-id-card',          'color' => '#0d6efd', 'bg' => '#e8f0fe'],
-    'Keterangan'    => ['icon' => 'fa-file-alt',          'color' => '#198754', 'bg' => '#e8f5e9'],
-    'Perizinan'     => ['icon' => 'fa-stamp',             'color' => '#fd7e14', 'bg' => '#fff3e0'],
-    'Bantuan Sosial'=> ['icon' => 'fa-hand-holding-heart','color' => '#dc3545', 'bg' => '#fce4e4'],
+    'Administrasi'       => ['icon' => 'fa-id-card', 'color' => '#0d6efd', 'bg' => '#e8f0fe'],
+    'Keterangan'         => ['icon' => 'fa-file-alt', 'color' => '#198754', 'bg' => '#e8f5e9'],
+    'Perizinan'          => ['icon' => 'fa-stamp',    'color' => '#fd7e14', 'bg' => '#fff3e0'],
+    'Pemutakhiran DTSEN' => ['icon' => 'fa-database', 'color' => '#6f42c1', 'bg' => '#f0ebff'],
 ];
 @endphp
 

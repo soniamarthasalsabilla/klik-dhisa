@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Edit – ' . ucfirst($section))
-@section('page-title', 'Edit ' . ($section === 'layanan' ? 'Layanan Desa' : ($section === 'arsip' ? 'Arsip Dokumen' : ($section === 'informasi' ? 'Informasi Publik' : 'Konten'))))
+@section('page-title', 'Edit ' . ($section === 'layanan' ? 'Layanan Desa' : ($section === 'arsip' ? 'Publikasi Desa' : ($section === 'informasi' ? 'Informasi Publik' : 'Konten'))))
 @section('breadcrumb', 'Kelola ' . ucfirst($section) . ' → Edit')
 
 @section('content')
@@ -13,7 +13,7 @@
         <h6 class="mb-0 fw-bold" style="color:var(--color-7);">
             <i class="fas fa-edit me-2" style="color:var(--color-5);"></i>
             @if($section === 'layanan')    Edit Layanan
-            @elseif($section === 'arsip')  Edit Dokumen Arsip
+            @elseif($section === 'arsip')  Edit Publikasi Desa
             @elseif($section === 'informasi') Edit Informasi Publik
             @else Edit Konten
             @endif

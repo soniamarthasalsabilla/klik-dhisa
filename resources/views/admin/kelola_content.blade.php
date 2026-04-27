@@ -6,7 +6,7 @@
 $sectionLabels = [
     'layanan'   => 'Layanan Desa',
     'informasi' => 'Informasi Publik',
-    'arsip'     => 'Arsip Dokumen',
+    'arsip'     => 'Publikasi Desa',
     'kades'     => 'Profil Kepala Desa',
 ];
 $sectionLabel = $sectionLabels[$section] ?? ucfirst($section);

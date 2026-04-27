@@ -34,19 +34,18 @@
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('aset.desa') }}"><i class="fas fa-building me-2"></i> Aset Desa</a></li>
                         <li><hr class="dropdown-divider border-secondary opacity-25 my-1"></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('informasi.publik') }}"><i class="fas fa-file-invoice me-2"></i> Informasi Publik</a></li>
-                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('arsip.artikel') }}"><i class="fas fa-archive me-2"></i> Arsip Dokumen</a></li>
-                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('transparansi.anggaran') }}"><i class="fas fa-coins me-2"></i> Transparansi Anggaran</a></li>
-                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('layanan.desa') }}"><i class="fas fa-headset me-2"></i> Layanan Desa</a></li>
+                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('arsip.artikel') }}"><i class="fas fa-archive me-2"></i> Publikasi Desa</a></li>
+                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('transparansi.anggaran') }}"><i class="fas fa-coins me-2"></i> Anggaran Desa</a></li>
                     </ul>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle px-3 text-white" href="#" data-bs-toggle="dropdown">Desa Cantik</a>
+                    <a class="nav-link dropdown-toggle px-3 text-white" href="#" data-bs-toggle="dropdown">Statistik Desa</a>
                     <ul class="dropdown-menu shadow border-0" style="background: var(--color-6);">
                         <li><span class="dropdown-header text-white opacity-50" style="font-size:.65rem;letter-spacing:.8px;text-transform:uppercase;">Statistik</span></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('stat.penduduk') }}"><i class="fas fa-user-friends me-2"></i> Statistik Penduduk</a></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('stat.keluarga') }}"><i class="fas fa-users me-2"></i> Statistik Keluarga</a></li>
-                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('stat.bantuan') }}"><i class="fas fa-hand-holding-heart me-2"></i> Statistik Bantuan</a></li>
+                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('stat.fasilitas') }}"><i class="fas fa-building me-2"></i> Statistik Fasilitas Umum</a></li>
                         <li><hr class="dropdown-divider border-secondary opacity-25 my-1"></li>
                         <li><span class="dropdown-header text-white opacity-50" style="font-size:.65rem;letter-spacing:.8px;text-transform:uppercase;">Potensi Desa</span></li>
                         <li><a class="dropdown-item text-white hover-gold" href="{{ route('umkm.desa') }}"><i class="fas fa-store me-2"></i> UMKM Desa</a></li>
@@ -57,7 +56,14 @@
                 <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('berita.desa') }}">Berita</a></li>
                 <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('galeri.desa') }}">Galeri</a></li>
                 <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('agenda.desa') }}">Agenda</a></li>
-                <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('pengaduan.form') }}">Pengaduan</a></li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle px-3 text-white" href="#" data-bs-toggle="dropdown">Layanan</a>
+                    <ul class="dropdown-menu shadow border-0" style="background: var(--color-6);">
+                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('layanan.desa') }}"><i class="fas fa-headset me-2"></i> Layanan Desa</a></li>
+                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('pengaduan.form') }}"><i class="fas fa-comment-dots me-2"></i> Pengaduan</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

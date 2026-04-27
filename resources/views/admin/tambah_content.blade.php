@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Tambah – ' . ucfirst($section))
-@section('page-title', 'Tambah ' . ($section === 'layanan' ? 'Layanan Desa' : ($section === 'arsip' ? 'Arsip Dokumen' : ($section === 'informasi' ? 'Informasi Publik' : 'Konten'))))
+@section('page-title', 'Tambah ' . ($section === 'layanan' ? 'Layanan Desa' : ($section === 'arsip' ? 'Publikasi Desa' : ($section === 'informasi' ? 'Informasi Publik' : 'Konten'))))
 @section('breadcrumb', 'Kelola ' . ucfirst($section) . ' → Tambah')
 
 @section('content')
@@ -13,7 +13,7 @@
         <h6 class="mb-0 fw-bold" style="color:var(--color-7);">
             <i class="fas fa-plus-circle me-2" style="color:var(--color-5);"></i>
             @if($section === 'layanan')    Tambah Layanan Baru
-            @elseif($section === 'arsip')  Tambah Dokumen Arsip
+            @elseif($section === 'arsip')  Tambah Publikasi Desa
             @elseif($section === 'informasi') Tambah Informasi Publik
             @else Tambah Konten
             @endif

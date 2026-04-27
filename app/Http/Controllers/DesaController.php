@@ -31,9 +31,13 @@ class DesaController extends Controller
 
     public function transparansi()
     {
-        $tahunList = Apbdes::select('tahun')->distinct()->orderByDesc('tahun')->pluck('tahun');
-        $tahun     = request('tahun', $tahunList->first() ?? date('Y'));
-        $items     = Apbdes::where('tahun', $tahun)->orderBy('jenis')->orderBy('urutan')->get();
+        $tahunList = Apbdes::select('tahun')->distinct()
+            ->where('tahun', '<', date('Y'))
+            ->orderByDesc('tahun')->pluck('tahun');
+        $tahun = request('tahun', $tahunList->first());
+        $items = $tahun
+            ? Apbdes::where('tahun', $tahun)->orderBy('jenis')->orderBy('urutan')->get()
+            : collect();
 
         $totalPendapatan = $items->where('jenis', 'pendapatan')->sum('anggaran');
         $totalAnggaran   = $items->where('jenis', 'belanja')->sum('anggaran');
@@ -41,12 +45,20 @@ class DesaController extends Controller
         $silpa           = $totalPendapatan - $totalRealisasi;
         $pctRealisasi    = $totalAnggaran > 0 ? round(($totalRealisasi / $totalAnggaran) * 100, 1) : 0;
 
-        $belanja      = $items->where('jenis', 'belanja');
-        $chartLabels  = $belanja->pluck('bidang')->toJson();
-        $chartData    = $belanja->pluck('anggaran')->toJson();
+        $pendapatan = $items->where('jenis', 'pendapatan');
+        $belanja    = $items->where('jenis', 'belanja');
+
+        // Group belanja by bidang for simplified display
+        $belanjaByBidang = $belanja->groupBy('bidang')->map(fn($rows) => [
+            'anggaran'  => $rows->sum('anggaran'),
+            'realisasi' => $rows->sum('realisasi'),
+        ]);
+
+        $chartLabels = $belanjaByBidang->keys()->toJson();
+        $chartData   = $belanjaByBidang->map(fn($r) => $r['anggaran'])->values()->toJson();
 
         return view('pages.transparansi', compact(
-            'tahun', 'tahunList', 'items', 'belanja',
+            'tahun', 'tahunList', 'pendapatan', 'belanja', 'belanjaByBidang',
             'totalPendapatan', 'totalAnggaran', 'totalRealisasi', 'silpa', 'pctRealisasi',
             'chartLabels', 'chartData'
         ));
@@ -95,13 +107,14 @@ class DesaController extends Controller
         return view('pages.statistik-keluarga', compact('kk', 'kesejahteraan', 'jaminan', 'totalKK'));
     }
 
-    public function statBantuan()
+    public function statFasilitasUmum()
     {
-        $pkh  = Statistic::where('kategori', 'PKH')->orderBy('id')->get();
-        $bpnt = Statistic::where('kategori', 'BPNT')->orderBy('id')->get();
-        $blt  = Statistic::where('kategori', 'BLT Dana Desa')->orderBy('id')->get();
+        $ibadah     = Statistic::where('kategori', 'Tempat Ibadah')->orderBy('id')->get();
+        $pendidikan = Statistic::where('kategori', 'Fasilitas Pendidikan')->orderBy('id')->get();
+        $kesehatan  = Statistic::where('kategori', 'Fasilitas Kesehatan')->orderBy('id')->get();
+        $olahraga   = Statistic::where('kategori', 'Sarana Olahraga')->orderBy('id')->get();
 
-        return view('pages.statistik-bantuan', compact('pkh', 'bpnt', 'blt'));
+        return view('pages.statistik-fasilitas-umum', compact('ibadah', 'pendidikan', 'kesehatan', 'olahraga'));
     }
 
     public function umkm()

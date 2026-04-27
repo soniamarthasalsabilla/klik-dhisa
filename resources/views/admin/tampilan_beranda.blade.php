@@ -41,12 +41,9 @@
                             <img id="preview-logo" src="" alt=""
                                  style="height:34px;width:auto;object-fit:contain;flex-shrink:0;display:none;">
                         @endif
-
-                        {{-- "Dhisâ" + nama desa sejajar --}}
                         <span style="font-size:1.05rem;font-weight:700;color:#fff;font-family:'Playfair Display',serif;">Dhis&#xE2;</span>
                         <span id="preview-nama-desa"
                               style="font-size:1.05rem;font-weight:700;color:rgba(255,255,255,0.85);font-family:'Playfair Display',serif;">{{ $settings['nama_navbar'] ?? '' }}</span>
-
                         <small class="ms-auto text-white opacity-40" style="font-size:0.6rem;">Preview</small>
                     </div>
 
@@ -80,8 +77,47 @@
             </div>
         </div>
 
+        {{-- Preview Footer --}}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-white fw-bold">
+                    <i class="fas fa-shoe-prints me-2 text-secondary"></i>Preview Footer
+                </div>
+                <div class="card-body d-flex flex-column gap-3">
+                    {{-- Live Preview Footer --}}
+                    <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2 flex-wrap" style="background:#1E5A52;">
+                        <img src="{{ asset('img/logo pemda.png') }}" alt="Pemda" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
+                        <img src="{{ asset('img/logo bps.png') }}" alt="BPS" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
+                        <img src="{{ asset('img/desa cantik.png') }}" alt="Desa Cantik" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
+                        <span style="width:1px;height:20px;background:rgba(255,255,255,.3);flex-shrink:0;"></span>
+                        @if(!empty($settings['logo_desa']))
+                            <img id="preview-footer-logo"
+                                 src="{{ asset('storage/' . $settings['logo_desa']) }}"
+                                 alt="Logo Desa"
+                                 style="height:24px;width:auto;object-fit:contain;flex-shrink:0;">
+                            <i id="preview-footer-icon" class="fas fa-landmark text-warning"
+                               style="font-size:1rem;flex-shrink:0;display:none;"></i>
+                        @else
+                            <i id="preview-footer-icon" class="fas fa-landmark text-warning"
+                               style="font-size:1rem;flex-shrink:0;"></i>
+                            <img id="preview-footer-logo" src="" alt=""
+                                 style="height:24px;width:auto;object-fit:contain;flex-shrink:0;display:none;">
+                        @endif
+                        <span style="font-size:.85rem;font-weight:700;color:#fff;font-family:'Playfair Display',serif;">Dhis&#xE2;</span>
+                        <span id="preview-footer-nama"
+                              style="font-size:.85rem;font-weight:700;color:rgba(255,255,255,.85);font-family:'Playfair Display',serif;">{{ $settings['nama_navbar'] ?? '' }}</span>
+                        <small class="ms-auto text-white opacity-40" style="font-size:0.6rem;">Footer</small>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-info-circle me-1 text-primary"></i>
+                        Footer menggunakan logo dan nama desa yang sama dengan Navbar. Edit di kartu sebelah kiri.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         {{-- Teks Hero --}}
-        <div class="col-lg-8">
+        <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-header bg-white fw-bold">
                     <i class="fas fa-heading me-2 text-success"></i>Teks Hero Beranda
@@ -183,18 +219,20 @@ function previewImg(input, imgId, placeholderId) {
     reader.readAsDataURL(file);
 }
 
-// Preview logo + sembunyikan ikon landmark saat logo diupload
+// Preview logo (navbar + footer) saat logo diupload
 function previewLogoAndText(input) {
     var file = input.files[0];
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function(e) {
-        var img = document.getElementById('preview-logo');
-        img.src = e.target.result;
-        img.style.display = '';
-        var icon = document.getElementById('preview-logo-icon');
-        if (icon) icon.style.display = 'none';
-        // uncheck hapus jika ada
+        ['preview-logo', 'preview-footer-logo'].forEach(function(id) {
+            var img = document.getElementById(id);
+            if (img) { img.src = e.target.result; img.style.display = ''; }
+        });
+        ['preview-logo-icon', 'preview-footer-icon'].forEach(function(id) {
+            var icon = document.getElementById(id);
+            if (icon) icon.style.display = 'none';
+        });
         var hapus = document.getElementById('hapus_logo');
         if (hapus) hapus.checked = false;
     };
@@ -203,24 +241,26 @@ function previewLogoAndText(input) {
 
 // Saat checkbox hapus logo dicentang → tampilkan kembali ikon
 function handleHapusLogo(checkbox) {
-    var img  = document.getElementById('preview-logo');
-    var icon = document.getElementById('preview-logo-icon');
+    var imgs  = ['preview-logo', 'preview-footer-logo'];
+    var icons = ['preview-logo-icon', 'preview-footer-icon'];
     if (checkbox.checked) {
-        if (img)  img.style.display  = 'none';
-        if (icon) icon.style.display = '';
+        imgs.forEach(id => { var el = document.getElementById(id); if(el) el.style.display = 'none'; });
+        icons.forEach(id => { var el = document.getElementById(id); if(el) el.style.display = ''; });
     } else {
-        if (img && img.src && img.src !== window.location.href) img.style.display = '';
-        if (icon) icon.style.display = 'none';
+        imgs.forEach(id => { var el = document.getElementById(id); if(el && el.src && el.src !== window.location.href) el.style.display = ''; });
+        icons.forEach(id => { var el = document.getElementById(id); if(el) el.style.display = 'none'; });
     }
 }
 
-// Live preview nama desa di navbar preview
+// Live preview nama desa di navbar & footer preview
 document.addEventListener('DOMContentLoaded', function () {
-    var input   = document.getElementById('input-nama-navbar');
-    var preview = document.getElementById('preview-nama-desa');
-    if (input && preview) {
+    var input = document.getElementById('input-nama-navbar');
+    if (input) {
         input.addEventListener('input', function () {
-            preview.textContent = this.value;
+            ['preview-nama-desa', 'preview-footer-nama'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = input.value;
+            });
         });
     }
 });

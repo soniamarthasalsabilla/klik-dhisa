@@ -384,7 +384,7 @@
             <div class="col-md-3 col-6">
                 <a href="{{ route('transparansi.anggaran') }}" class="qa-card">
                     <div class="qa-icon" style="background:#e8f5e9;"><i class="fas fa-chart-pie" style="color:#198754;"></i></div>
-                    <div class="qa-title">Transparansi</div>
+                    <div class="qa-title">Anggaran Desa</div>
                     <p class="qa-desc">Laporan APBDes dan keuangan desa</p>
                 </a>
             </div>

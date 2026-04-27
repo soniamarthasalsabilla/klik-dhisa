@@ -3,7 +3,7 @@
 @section('content')
 <section class="py-3" style="background: white; border-bottom: 3px solid var(--color-5);">
     <div class="container text-center py-4">
-        <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">Arsip Artikel & Berita</h2>
+        <h2 class="fw-bold mb-2" style="color: var(--color-7); font-size: 2rem;">Publikasi Desa</h2>
         <p class="mb-0" style="color: var(--color-6); font-size: 1rem;">Kumpulan informasi, kegiatan, dan kabar terbaru dari Desa Tajungan</p>
     </div>
 </section>
@@ -15,10 +15,11 @@
             <div class="col-md-8 mb-3 mb-md-0">
                 <div class="d-flex gap-2 flex-wrap" id="filter-buttons">
                     <button class="btn btn-navy text-white px-4 rounded-pill filter-btn active" data-filter="all" style="background: var(--navy);">Semua</button>
-                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Kegiatan">Kegiatan</button>
-                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Pembangunan">Pembangunan</button>
-                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Ekonomi">Ekonomi</button>
-                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Kesehatan">Kesehatan</button>
+                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Peraturan Desa">Peraturan Desa</button>
+                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Laporan Keuangan">Laporan Keuangan</button>
+                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Berita Acara">Berita Acara</button>
+                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="SK Kepala Desa">SK Kepala Desa</button>
+                    <button class="btn btn-outline-secondary px-4 rounded-pill filter-btn" data-filter="Profil & Data">Profil & Data</button>
                 </div>
             </div>
             <div class="col-md-4">
@@ -26,7 +27,7 @@
                     <span class="input-group-text bg-white border-0 ps-3">
                         <i class="fas fa-search text-muted"></i>
                     </span>
-                    <input type="text" id="search-article" class="form-control border-0 shadow-none" placeholder="Cari judul artikel...">
+                    <input type="text" id="search-article" class="form-control border-0 shadow-none" placeholder="Cari judul publikasi...">
                 </div>
             </div>
         </div>
@@ -67,7 +68,7 @@
             @empty
             <div class="col-12 text-center py-5">
                 <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada arsip artikel yang tersedia.</p>
+                <p class="text-muted">Belum ada publikasi yang tersedia.</p>
             </div>
             @endforelse
         </div>
@@ -75,7 +76,7 @@
         {{-- Pesan Jika Data Tidak Ditemukan --}}
         <div id="no-results" class="text-center py-5 d-none">
             <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Maaf, artikel yang Anda cari tidak ditemukan.</p>
+            <p class="text-muted">Maaf, publikasi yang Anda cari tidak ditemukan.</p>
         </div>
 
         <nav class="mt-5" id="pagination-nav">
