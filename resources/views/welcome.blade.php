@@ -293,7 +293,7 @@
                         <i class="fas fa-landmark"></i>Profil Desa
                     </a>
                     <a href="{{ route('layanan.desa') }}" class="hero-cta-secondary">
-                        <i class="fas fa-headset"></i>Info Layanan
+                        <i class="fas fa-comment-dots"></i>Pengaduan & Aspirasi
                     </a>
                 </div>
             </div>

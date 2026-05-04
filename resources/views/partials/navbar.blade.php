@@ -56,14 +56,7 @@
                 <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('berita.desa') }}">Berita</a></li>
                 <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('galeri.desa') }}">Galeri</a></li>
                 <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('agenda.desa') }}">Agenda</a></li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle px-3 text-white" href="#" data-bs-toggle="dropdown">Layanan</a>
-                    <ul class="dropdown-menu shadow border-0" style="background: var(--color-6);">
-                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('layanan.desa') }}"><i class="fas fa-headset me-2"></i> Layanan Desa</a></li>
-                        <li><a class="dropdown-item text-white hover-gold" href="{{ route('pengaduan.form') }}"><i class="fas fa-comment-dots me-2"></i> Pengaduan</a></li>
-                    </ul>
-                </li>
+                <li class="nav-item"><a class="nav-link px-3 text-white" href="{{ route('pengaduan.form') }}">Pengaduan</a></li>
             </ul>
         </div>
     </div>
