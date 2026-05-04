@@ -14,11 +14,11 @@
         <div class="row g-4"> <div class="col-lg-4">
                 <a class="navbar-brand fw-bold d-flex align-items-center flex-wrap gap-2 mb-2" href="/">
                     {{-- 3 Logo statis --}}
-                    <img src="{{ asset('img/logo pemda.png') }}" alt="Pemda Bangkalan"
+                    <img src="{{ asset('img/logo-pemda.png') }}" alt="Pemda Bangkalan"
                          style="height:28px;width:auto;object-fit:contain;opacity:.85;">
-                    <img src="{{ asset('img/logo bps.png') }}" alt="BPS"
+                    <img src="{{ asset('img/logo-bps.png') }}" alt="BPS"
                          style="height:28px;width:auto;object-fit:contain;opacity:.85;">
-                    <img src="{{ asset('img/desa cantik.png') }}" alt="Desa Cantik"
+                    <img src="{{ asset('img/desa-cantik.png') }}" alt="Desa Cantik"
                          style="height:28px;width:auto;object-fit:contain;opacity:.85;">
                     <span style="width:1px;height:28px;background:rgba(255,255,255,.3);flex-shrink:0;"></span>
                     {{-- Logo desa dari DB --}}

@@ -402,7 +402,7 @@
                 @if($kades?->image)
                     <img src="{{ asset("storage/{$kades->image}") }}" class="kades-img" alt="Kepala Desa">
                 @else
-                    <img src="{{ asset('img/desa cantik.png') }}" class="kades-img" alt="Kepala Desa"
+                    <img src="{{ asset('img/desa-cantik.png') }}" class="kades-img" alt="Kepala Desa"
                          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                     <div style="display:none;width:260px;height:260px;border-radius:50%;background:var(--color-1);border:6px solid white;box-shadow:0 12px 40px rgba(30,90,82,.2);margin:0 auto;align-items:center;justify-content:center;">
                         <i class="fas fa-user fa-5x" style="color:var(--color-4);"></i>

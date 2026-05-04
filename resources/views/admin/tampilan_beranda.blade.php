@@ -86,9 +86,9 @@
                 <div class="card-body d-flex flex-column gap-3">
                     {{-- Live Preview Footer --}}
                     <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2 flex-wrap" style="background:#1E5A52;">
-                        <img src="{{ asset('img/logo pemda.png') }}" alt="Pemda" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
-                        <img src="{{ asset('img/logo bps.png') }}" alt="BPS" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
-                        <img src="{{ asset('img/desa cantik.png') }}" alt="Desa Cantik" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
+                        <img src="{{ asset('img/logo-pemda.png') }}" alt="Pemda" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
+                        <img src="{{ asset('img/logo-bps.png') }}" alt="BPS" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
+                        <img src="{{ asset('img/desa-cantik.png') }}" alt="Desa Cantik" style="height:20px;width:auto;object-fit:contain;opacity:.9;">
                         <span style="width:1px;height:20px;background:rgba(255,255,255,.3);flex-shrink:0;"></span>
                         @if(!empty($settings['logo_desa']))
                             <img id="preview-footer-logo"

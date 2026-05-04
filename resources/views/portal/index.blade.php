@@ -360,21 +360,21 @@
         {{-- Logo Strip: Pemda · BPS · Desa Cantik --}}
         <div class="logo-strip">
             <div class="logo-item">
-                <img src="/img/logo pemda.png" alt="Logo Pemda Bangkalan"
+                <img src="{{ asset('img/logo-pemda.png') }}" alt="Logo Pemda Bangkalan"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                 <div class="logo-fb"><i class="fas fa-landmark" style="font-size:1.4rem;color:rgba(255,255,255,.85);"></i></div>
                 <div class="logo-label">Pemda<br>Bangkalan</div>
             </div>
             <div class="logo-sep"></div>
             <div class="logo-item">
-                <img src="/img/logo bps.png" alt="Logo BPS"
+                <img src="{{ asset('img/logo-bps.png') }}" alt="Logo BPS"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                 <div class="logo-fb"><i class="fas fa-chart-bar" style="font-size:1.4rem;color:rgba(255,255,255,.85);"></i></div>
                 <div class="logo-label">Badan Pusat<br>Statistik</div>
             </div>
             <div class="logo-sep"></div>
             <div class="logo-item">
-                <img src="/img/desa cantik.png" alt="Desa Cantik"
+                <img src="{{ asset('img/desa-cantik.png') }}" alt="Desa Cantik"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                 <div class="logo-fb"><i class="fas fa-star" style="font-size:1.4rem;color:rgba(255,255,255,.85);"></i></div>
                 <div class="logo-label">Desa<br>Cantik</div>

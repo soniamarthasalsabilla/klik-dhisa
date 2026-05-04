@@ -39,7 +39,7 @@
                              class="rounded-circle border"
                              style="width:140px;height:140px;object-fit:cover;">
                     @else
-                        <img src="{{ asset('img/desa cantik.png') }}"
+                        <img src="{{ asset('img/desa-cantik.png') }}"
                              id="preview-foto"
                              alt="Foto Kades"
                              class="rounded-circle border"
