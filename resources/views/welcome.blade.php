@@ -323,12 +323,12 @@
      =============================================================== --}}
 <section class="py-4 bg-light">
     <div class="container">
-        <div class="stat-strip">
+        <div class="stat-strip" data-aos="fade-up" data-aos-delay="100">
             <div class="row g-0 align-items-center">
                 @php $stats = [
-                    ['fa-users',          '2.450', 'Jiwa', 'Total Penduduk'],
+                    ['fa-users',          '2450',  'Jiwa', 'Total Penduduk'],
                     ['fa-ruler-combined', '145',   'Ha',   'Luas Wilayah'],
-                    ['fa-map-signs',      '12/4',  '',     'RT / RW'],
+                    ['fa-map-signs',      '12',    'RT',   'RT / RW'],
                     ['fa-store',          '45',    '+',    'UMKM'],
                     ['fa-calendar-check', '1945',  '',     'Tahun Berdiri'],
                 ]; @endphp
@@ -336,7 +336,7 @@
                 <div class="col">
                     <div class="stat-item">
                         <div class="icon"><i class="fas {{ $ic }}"></i></div>
-                        <div class="val">{{ $val }}<span style="font-size:.65rem;font-weight:400;color:#888;"> {{ $sat }}</span></div>
+                        <div class="val"><span data-counter data-target="{{ $val }}">{{ $val }}</span><span style="font-size:.65rem;font-weight:400;color:#888;"> {{ $sat }}</span></div>
                         <div class="lbl">{{ $lbl }}</div>
                     </div>
                 </div>
@@ -354,34 +354,34 @@
      =============================================================== --}}
 <section class="py-5" style="background: var(--color-1);">
     <div class="container">
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" data-aos="fade-up">
             <span class="section-label"><i class="fas fa-bolt"></i>Akses Cepat</span>
             <h2 class="section-title">Ada yang Bisa Kami Bantu?</h2>
             <p class="section-sub">Akses layanan desa langsung dari sini</p>
         </div>
         <div class="row g-3 justify-content-center">
-            <div class="col-md-3 col-6">
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="0">
                 <a href="{{ route('layanan.desa') }}" class="qa-card">
                     <div class="qa-icon" style="background:#E8F5F0;"><i class="fas fa-headset" style="color:#1E5A52;"></i></div>
                     <div class="qa-title">Info Layanan</div>
                     <p class="qa-desc">Syarat & prosedur layanan administrasi desa</p>
                 </a>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
                 <a href="{{ route('pengaduan.form') }}" class="qa-card">
                     <div class="qa-icon" style="background:#e8f0fe;"><i class="fas fa-comment-dots" style="color:#0d6efd;"></i></div>
                     <div class="qa-title">Laporan Warga</div>
                     <p class="qa-desc">Sampaikan pengaduan atau aspirasi Anda</p>
                 </a>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
                 <a href="{{ route('agenda.desa') }}" class="qa-card">
                     <div class="qa-icon" style="background:#fff3e0;"><i class="fas fa-calendar-check" style="color:#fd7e14;"></i></div>
                     <div class="qa-title">Jadwal Kegiatan</div>
                     <p class="qa-desc">Kalender kegiatan dan acara desa terkini</p>
                 </a>
             </div>
-            <div class="col-md-3 col-6">
+            <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
                 <a href="{{ route('transparansi.anggaran') }}" class="qa-card">
                     <div class="qa-icon" style="background:#e8f5e9;"><i class="fas fa-chart-pie" style="color:#198754;"></i></div>
                     <div class="qa-title">Anggaran Desa</div>
@@ -398,7 +398,7 @@
 <section class="py-5 bg-white">
     <div class="container py-2">
         <div class="row align-items-center g-5">
-            <div class="col-lg-4 text-center">
+            <div class="col-lg-4 text-center" data-aos="fade-right">
                 @if($kades?->image)
                     <img src="{{ asset("storage/{$kades->image}") }}" class="kades-img" alt="Kepala Desa">
                 @else
@@ -413,7 +413,7 @@
                     <div class="text-muted" style="font-size:.78rem;">{{ $kades->body ?? 'Kepala Desa Tajungan' }}</div>
                 </div>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-8" data-aos="fade-left">
                 <span class="section-label"><i class="fas fa-user-tie"></i>Sambutan</span>
                 <h2 class="section-title">Sambutan Kepala Desa</h2>
                 <div class="kades-quote">
@@ -450,7 +450,7 @@
      =============================================================== --}}
 <section class="py-5" style="background: var(--color-7);">
     <div class="container">
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" data-aos="fade-up">
             <span class="section-label" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);">
                 <i class="fas fa-concierge-bell"></i>Layanan Desa
             </span>
@@ -464,7 +464,7 @@
                 ['fa-stamp',             '#fff3cd','#856404', 'Perizinan',      'IMB, Izin Usaha, Izin Keramaian'],
                 ['fa-hand-holding-heart','#f8d7da','#842029', 'Bantuan Sosial', 'PKH, BPNT, BLT Dana Desa'],
             ] as [$ic, $bg, $col, $title, $desc])
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                 <a href="{{ route('layanan.desa') }}" class="layanan-highlight">
                     <div class="lh-icon" style="background:{{ $bg }};"><i class="fas {{ $ic }}" style="color:{{ $col }};"></i></div>
                     <div class="lh-title">{{ $title }}</div>
@@ -485,7 +485,7 @@
         <div class="row g-4">
 
             {{-- Berita --}}
-            <div class="col-lg-8">
+            <div class="col-lg-8" data-aos="fade-up">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div>
                         <span class="section-label" style="margin-bottom:6px;"><i class="fas fa-newspaper"></i>Berita</span>
@@ -549,7 +549,7 @@
             </div>
 
             {{-- Agenda --}}
-            <div class="col-lg-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="150">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div>
                         <span class="section-label" style="margin-bottom:6px;"><i class="fas fa-calendar-alt"></i>Agenda</span>
@@ -593,7 +593,7 @@
      =============================================================== --}}
 <section class="py-5 bg-white">
     <div class="container">
-        <div class="d-flex align-items-end justify-content-between mb-4">
+        <div class="d-flex align-items-end justify-content-between mb-4" data-aos="fade-up">
             <div>
                 <span class="section-label"><i class="fas fa-store"></i>UMKM</span>
                 <h2 class="section-title mb-0">UMKM Unggulan Desa</h2>
@@ -609,7 +609,7 @@
                     ? (Str::startsWith($umkm->foto, ['http://','https://']) ? $umkm->foto : asset("storage/{$umkm->foto}"))
                     : 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&q=80';
             @endphp
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                 <div class="umkm-card">
                     <div class="thumb">
                         <img src="{{ $uSrc }}" alt="{{ $umkm->nama_usaha }}" loading="lazy">
@@ -658,7 +658,7 @@
 <section class="py-5" style="background:var(--color-1);">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-5">
+            <div class="col-lg-5" data-aos="fade-right">
                 <span class="section-label"><i class="fas fa-chart-pie"></i>APBDes 2026</span>
                 <h2 class="section-title">Transparansi Anggaran Desa</h2>
                 <p class="section-sub mb-4">Desa Tajungan berkomitmen mengelola keuangan secara transparan dan akuntabel untuk kepentingan seluruh warga.</p>
@@ -683,7 +683,7 @@
                     <i class="fas fa-chart-pie"></i>Lihat Laporan Lengkap
                 </a>
             </div>
-            <div class="col-lg-7">
+            <div class="col-lg-7" data-aos="fade-left">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-3">
                     <canvas id="budgetChart" style="max-height:280px;"></canvas>
                 </div>
@@ -698,7 +698,7 @@
 <section class="py-5 bg-white">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-4">
+            <div class="col-lg-4" data-aos="fade-right">
                 <span class="section-label"><i class="fas fa-map-marked-alt"></i>Lokasi</span>
                 <h2 class="section-title">Letak Geografis Desa</h2>
                 <p class="section-sub mb-4">Desa Tajungan terletak di pesisir barat Pulau Madura, Kecamatan Kamal, Kabupaten Bangkalan, dengan luas wilayah ± 145 Ha.</p>
@@ -725,7 +725,7 @@
                     <i class="fas fa-map-marked-alt"></i>Buka Peta Tematik
                 </a>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-8" data-aos="fade-left">
                 <div class="position-relative rounded-4 overflow-hidden shadow-sm" style="height:360px;border:1px solid var(--color-2);">
                     <div id="map-preview" style="height:100%;width:100%;"></div>
                     <a href="{{ route('peta.desa') }}"
@@ -744,7 +744,7 @@
      =============================================================== --}}
 <section class="py-5" style="background:var(--color-7);">
     <div class="container">
-        <div class="text-center mb-4">
+        <div class="text-center mb-4" data-aos="fade-up">
             <span class="section-label" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);"><i class="fas fa-phone-alt"></i>Darurat</span>
             <h2 class="section-title text-white">Kontak Darurat</h2>
             <p class="section-sub" style="color:rgba(255,255,255,.6);">Butuh bantuan segera? Hubungi layanan darurat berikut</p>
@@ -752,7 +752,7 @@
         <div class="row g-3 justify-content-center">
             @forelse($kontakDarurat as $kd)
             @php $href = 'tel:'.preg_replace('/[^0-9+]/','',$kd->nomor); @endphp
-            <div class="col-6 col-md-3">
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 80 }}">
                 <a href="{{ $href }}" class="darurat-card">
                     <div style="width:50px;height:50px;border-radius:14px;background:{{ $kd->warna_bg }};display:flex;align-items:center;justify-content:center;margin:0 auto;">
                         <i class="fas {{ $kd->icon }}" style="color:{{ $kd->warna_teks }};font-size:1.2rem;"></i>
